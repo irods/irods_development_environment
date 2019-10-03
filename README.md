@@ -17,7 +17,7 @@ correctness of builds.
 ## How to build:
 1. Build the Docker images:
 ```
-$ cd /full/path/to/irods_docker_repository_clone/irods_developer_environment
+$ cd /full/path/to/irods_development_environment_repository_clone
 $ docker build -f Dockerfile.irods_core_builder.ubuntu16 -t irods-core-builder-ubuntu16 .
 $ docker build -f Dockerfile.irods_core_builder.centos7 -t irods-core-builder-centos7 .
 $ docker build -f Dockerfile.irods_runner.ubuntu16 -t irods-runner-ubuntu16 .
