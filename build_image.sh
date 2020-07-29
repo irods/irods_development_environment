@@ -22,7 +22,7 @@ _EOF_
 }
 
 # defaults
-image_name=irods_ub16_builder
+image_name=irods-core-builder
 build_args=
 docker_build_args=
 dockerfile=Dockerfile.ub16

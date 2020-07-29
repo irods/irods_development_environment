@@ -45,5 +45,5 @@ ENTRYPOINT ["./build_and_copy_packages_to_dir.sh"]
 
 # How to use:
 # ./build_image.sh
-# docker run --rm -v /host/path/to/irods_source:/irods_source -v /host/path/to/irods_build:/irods_build -v /host/path/to/icommands_source:/icommands_source -v /host/path/to/icommands_build:/icommands_build -v /host/path/to/irods_packages:/irods_packages irods_ub16_builder
+# docker run --rm -v /host/path/to/irods_source:/irods_source -v /host/path/to/irods_build:/irods_build -v /host/path/to/icommands_source:/icommands_source -v /host/path/to/icommands_build:/icommands_build -v /host/path/to/irods_packages:/irods_packages irods-core-builder
 
