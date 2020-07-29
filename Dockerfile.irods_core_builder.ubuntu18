@@ -1,10 +1,11 @@
 #
 # iRODS Common
 #
-FROM ubuntu:16.04 as irods_common
+FROM ubuntu:18.04 as irods_common
 
 RUN apt-get update && \
-    apt-get install -y apt-transport-https wget lsb-release sudo \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y apt-transport-https wget lsb-release sudo gnupg \
                        python python-psutil python-requests python-jsonschema \
                        libssl-dev super lsof postgresql odbc-postgresql libjson-perl
 
@@ -13,6 +14,7 @@ RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add -;
     wget -qO - https://core-dev.irods.org/irods-core-dev-signing-key.asc | apt-key add -; \
     echo "deb [arch=amd64] https://core-dev.irods.org/apt/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/renci-irods-core-dev.list; \
     apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
     apt-get install -y 'irods-externals*'
 
 #
@@ -22,6 +24,7 @@ FROM irods_common as irods_package_builder_base
 
 # Install iRODS dependencies.
 RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
     apt-get install -y git ninja-build libpam0g-dev unixodbc-dev libkrb5-dev libfuse-dev \
                        libcurl4-gnutls-dev libbz2-dev libxml2-dev zlib1g-dev python-dev \
                        make gcc help2man 

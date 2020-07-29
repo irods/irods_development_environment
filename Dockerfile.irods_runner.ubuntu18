@@ -1,0 +1,22 @@
+#
+# iRODS Runner
+#
+FROM ubuntu:18.04 as irods-runner
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y apt-transport-https wget lsb-release sudo gnupg \
+                       python python-psutil python-requests python-jsonschema \
+                       libssl-dev super lsof postgresql odbc-postgresql libjson-perl
+
+RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add -; \
+    echo "deb [arch=amd64] https://packages.irods.org/apt/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/renci-irods.list; \
+    wget -qO - https://core-dev.irods.org/irods-core-dev-signing-key.asc | apt-key add -; \
+    echo "deb [arch=amd64] https://core-dev.irods.org/apt/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/renci-irods-core-dev.list; \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y 'irods-externals*' irods-runtime=4.2.8 irods-icommands=4.2.8 irods-server=4.2.8 irods-database-plugin-postgres=4.2.8
+
+ADD keep_alive.sh /keep_alive.sh
+RUN chmod +x /keep_alive.sh
+ENTRYPOINT ["/keep_alive.sh"]
