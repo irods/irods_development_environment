@@ -18,8 +18,10 @@ correctness of builds.
 ```
 $ cd /full/path/to/irods_development_environment_repository_clone
 $ docker build -f Dockerfile.irods_core_builder.ubuntu16 -t irods-core-builder-ubuntu16 .
+$ docker build -f Dockerfile.irods_core_builder.ubuntu18 -t irods-core-builder-ubuntu18 .
 $ docker build -f Dockerfile.irods_core_builder.centos7 -t irods-core-builder-centos7 .
 $ docker build -f Dockerfile.irods_runner.ubuntu16 -t irods-runner-ubuntu16 .
+$ docker build -f Dockerfile.irods_runner.ubuntu18 -t irods-runner-ubuntu18 .
 $ docker build -f Dockerfile.irods_runner.centos7 -t irods-runner-centos7 .
 ```
 
