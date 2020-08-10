@@ -7,7 +7,9 @@ Builds iRODS repository, installs the dev/runtime packages, and then builds iCom
 Available options:
 
     --server-only           Only builds the server
-    -j, --jobs              Number of jobs to use with make
+    -d, --debug             Build with symbols for debugging
+    -j, --jobs              Number of jobs for make tool
+    -n, --ninja)            Use ninja builder as the make tool
     -h, --help              This message
 _EOF_
     exit
@@ -23,15 +25,24 @@ else
 fi
 
 server_only=0
+make_program="make"
+make_program_config=""
+build_jobs=0
+debug_config=""
 
 while [ -n "$1" ]; do
     case "$1" in
         --server-only)           server_only=1;;
-        -j|--jobs)               shift; build_jobs=${1};;
+        -n|--ninja)              make_program_config="-GNinja";
+                                 make_program="ninja";;
+        -j|--jobs)               shift; build_jobs=$(($1 + 0));;
+        -d|--debug)              debug_config="-DCMAKE_BUILD_TYPE=Debug";;
         -h|--help)               usage;;
     esac
     shift
 done
+
+build_jobs=$(( !build_jobs ? $(nproc) - 1 : build_jobs )) #prevent maxing out CPUs
 
 echo "========================================="
 echo "beginning build of iRODS server"
@@ -39,12 +50,12 @@ echo "========================================="
 
 # Build iRODS
 mkdir -p /irods_build && cd /irods_build
-cmake /irods_source
+cmake ${make_program_config} ${debug_config} /irods_source
 if [[ -z ${build_jobs} ]]; then
-    make -j package
+    ${make_program} package
 else
     echo "using [${build_jobs}] threads"
-    make -j ${build_jobs} package
+    ${make_program} -j ${build_jobs} package
 fi
 
 # Copy packages to mounts
@@ -72,12 +83,12 @@ fi
 
 # Build icommands
 mkdir -p /icommands_build && cd /icommands_build
-cmake /icommands_source
+cmake ${make_program_config} ${debug_config} /icommands_source
 if [[ -z ${build_jobs} ]]; then
-    make -j package
+    ${make_program} package
 else
     echo "using [${build_jobs}] threads"
-    make -j ${build_jobs} package
+    ${make_program} -j ${build_jobs} package
 fi
 
 # Copy packages to mounts
