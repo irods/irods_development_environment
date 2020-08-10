@@ -1,5 +1,26 @@
-## Prerequisites
-1. Clone 3 git repositories:
+# iRODS Development Environment
+
+This repository contains tools for the running troubleshooting of a Docker-containerized iRODS server.
+
+## Contents of this Guide
+  1. [General Setup](#general-setup)
+    1. [Prerequisites](#prerequisites)
+    1. [How to Build](#how-to-build-eg-ubuntu-16)
+    1. [How to Run](#how-to-run-eg-ubuntu-16)
+    1. [How to Develop](#how-to-develop-eg-ubuntu-16)
+  1. [Simplified Setup](#simplified-setup)
+  1. Debugging
+    1. `gdb`
+    1. `rr`
+    1. `valgrind`
+    1. ( `cppcheck`,  clang static analyzer, ... ?)
+---
+
+## General Setup
+
+### Prerequisites
+
+1. Create custom paths.
 ```
 $ git clone https://github.com/irods/irods_development_environment /full/path/to/irods_development_environment_repository_clone
 $ git clone --recursive https://github.com/irods/irods /full/path/to/irods_repository_clone
@@ -25,7 +46,7 @@ $ docker build -f Dockerfile.irods_runner.ubuntu16 -t irods-runner-ubuntu16 .
 $ docker build -f Dockerfile.irods_runner.ubuntu18 -t irods-runner-ubuntu18 .
 ```
 
-## How to build (e.g. Ubuntu 16)
+### How to build (e.g. Ubuntu 16)
 1. Run iRODS builder container:
 ```
 $ docker run --rm \
@@ -48,7 +69,7 @@ Available options:
     -h, --help              This message
 ```
 
-## How to run (e.g. Ubuntu 16)
+### How to run (e.g. Ubuntu 16)
 1. Run iRODS Runner container:
 ```
 $ docker run -d --name irods-runner-ubuntu16_whatever \
@@ -73,3 +94,53 @@ root@19b35a476e2d:/# dpkg -i /irods_packages/irods-{package_name(s)}.deb
 5. Rinse and repeat
 
 It is encouraged to build your own wrapper script with your commonly used volume mounts to make this process easier.
+
+---
+
+## Simplified Setup
+
+If coming to iRODS for the first time, a more automated approach will do for an introduction:
+
+1. Into a new or initially empty directory, clone this repository:
+```
+$ mkdir ~/dev_root
+$ cd ~/dev_root ; git clone https://github.com/irods/irods_development_environment
+```
+
+2. Also clone the source code repos from which to build:
+```
+$ git clone --recursive https://github.com/irods/irods
+$ git clone https://github.com/irods/irods_client_icommands
+```
+
+3. Create binary and package output directories:
+```
+$ mkdir irods_build_output icommands_build_output irods_package_output
+```
+
+4. Now we can build and run model setup, using the source and output directories just created.
+```
+$ cd irods_development_environment
+$ ./run_debugger.sh -d .. -V volumes.include.sh --debug
+```
+
+5.  This will build a docker image suitable for
+   - *initially* running an iRODS server (an old version) installed from the iRODS internet repo
+   - upgrading from there to a just-built iRODS server, eg. built from source
+   - leveraging debugging tools (currently `gdb`, `rr`, and `valgrind`) against the running iRODS server
+     (if we used `--debug` as in the previous step)
+
+6. These are possible informative but otherwise no-op invocations of `run_debugger.sh` :
+   - Explain usage:
+   ```
+   $ ./run_debugger.sh -h
+   ```
+   - Print out settings but do nothing.
+   ```
+   $ ./run_debugger.sh  -V volumes.include.sh -d .. --dry-run
+   ```
+7. Notes
+  - when rebuilding, esp for another platform (-p), clear the binary output directories
+    * ```
+      sudo rm -fr ~/dev_root/*_output/* ~/dev_root/*_output/.ninja*
+      ```
