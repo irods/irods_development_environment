@@ -9,7 +9,7 @@ Available options:
     --server-only           Only builds the server
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
-    -n, --ninja)            Use ninja builder as the make tool
+    -N, --ninja)            Use ninja builder as the make tool
     -h, --help              This message
 _EOF_
     exit
@@ -33,7 +33,7 @@ debug_config=""
 while [ -n "$1" ]; do
     case "$1" in
         --server-only)           server_only=1;;
-        -n|--ninja)              make_program_config="-GNinja";
+        -N|--ninja)              make_program_config="-GNinja";
                                  make_program="ninja";;
         -j|--jobs)               shift; build_jobs=$(($1 + 0));;
         -d|--debug)              debug_config="-DCMAKE_BUILD_TYPE=Debug";;
