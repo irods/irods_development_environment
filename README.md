@@ -3,17 +3,17 @@
 This repository contains tools for the running troubleshooting of a Docker-containerized iRODS server.
 
 ## Contents of this Guide
-  1. [General Setup](#general-setup)
-    1. [Prerequisites](#prerequisites)
-    1. [How to Build](#how-to-build-eg-ubuntu-16)
-    1. [How to Run](#how-to-run-eg-ubuntu-16)
-    1. [How to Develop](#how-to-develop-eg-ubuntu-16)
-  1. [Simplified Setup](#simplified-setup)
-  1. Debugging
-    1. `gdb`
-    1. `rr`
-    1. `valgrind`
-    1. ( `cppcheck`,  clang static analyzer, ... ?)
+   1. [General Setup](#general-setup)
+      1. [Prerequisites](#prerequisites)
+      1. [How to Build](#how-to-build-eg-ubuntu-16)
+      1. [How to Run](#how-to-run-eg-ubuntu-16)
+      1. [How to Develop](#how-to-develop-eg-ubuntu-16)
+   1. [Simplified Setup](#simplified-setup)
+   1. Debugging
+      1. `gdb`
+      1. `rr`
+      1. `valgrind`
+      1. ( `cppcheck`,  clang static analyzer, ... ?)
 ---
 
 ## General Setup
@@ -140,7 +140,8 @@ $ ./run_debugger.sh -d .. -V volumes.include.sh --debug
    $ ./run_debugger.sh  -V volumes.include.sh -d .. --dry-run
    ```
 7. Notes
-  - when rebuilding, esp for another platform (-p), clear the binary output directories
-    * ```
-      sudo rm -fr ~/dev_root/*_output/* ~/dev_root/*_output/.ninja*
-      ```
+  - When rebuilding, esp for another platform (-p), it may be necessary to clear the binary output directories
+    ```
+      $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu16.4-2-stable  # (optionally preserve previous work)
+      $ sudo rm -fr ~/dev_root/*_output/* ~/dev_root/*_output/.ninja*
+    ```
