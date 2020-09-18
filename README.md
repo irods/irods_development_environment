@@ -9,8 +9,8 @@ This repository contains tools for the running troubleshooting of a Docker-conta
       1. [How to Run](#how-to-run-eg-ubuntu-16)
       1. [How to Develop](#how-to-develop-eg-ubuntu-16)
    1. [Simplified Setup](#simplified-setup)
-   1. Debugging
-      1. `gdb`
+   1. [Debugging](#debugging)
+      1. [`gdb`](#gdb)
       1. `rr`
       1. `valgrind`
       1. ( `cppcheck`,  clang static analyzer, ... ?)
@@ -83,7 +83,7 @@ $ docker exec -it irods-runner-ubuntu16_whatever /bin/bash
 Note: iRODS and iCommands are not installed out of the box, nor is the ICAT database prepared.
 The usual steps of an initial iRODS installation must be followed on first-time installation.
 
-## How to develop (e.g. Ubuntu 16)
+### How to develop (e.g. Ubuntu 16)
 1. Edit iRODS/iCommands source files...
 2. Build iRODS and iCommands (see "How to build")
 3. Install packages of interest on iRODS Runner (inside iRODS Runner container):
@@ -145,3 +145,34 @@ $ ./run_debugger.sh -d .. -V volumes.include.sh --debug
       $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu16.4-2-stable  # (optionally preserve previous work)
       $ sudo rm -fr ~/dev_root/*_output/* ~/dev_root/*_output/.ninja*
     ```
+
+---
+
+## Debugging
+
+### GDB
+
+Start a debugger container.
+
+ - In terminal #1, as iRODS service account:
+    - pkill irodsReServer (prevent API's being invoked from delay server)
+    - attach to irods server
+    ```
+    gdb -p PID
+    ```
+
+    with PID = the parent (not grandparent) irodsServer process
+
+    parent PID usually = 1 + grandparent PID
+
+    - Inside the GDB console:
+    ```
+    set follow-fork-mode child
+    b rsApiHandler
+    c
+    ```
+
+ - In terminal #2:
+
+    run the client to invoke the API
+
