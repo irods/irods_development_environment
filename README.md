@@ -11,8 +11,8 @@ This repository contains tools for the running troubleshooting of a Docker-conta
    1. [Simplified Setup](#simplified-setup)
    1. [Debugging](#debugging)
       1. [`gdb`](#gdb)
-      1. `rr`
-      1. `valgrind`
+      1. [`rr`](#rr)
+      1. [`valgrind`](#valgrind)
       1. ( `cppcheck`,  clang static analyzer, ... ?)
 ---
 
@@ -150,6 +150,18 @@ $ ./run_debugger.sh -d .. -V volumes.include.sh --debug
 
 ## Debugging
 
+In the run/debug container created by the [simplified](#simplified-setup) procedure, placing `/opt/debug_tools/bin`
+at the head of the PATH environment variable will cause the shell to invoke updated versions executables of
+`gdb`, `rr`, and `valgrind`.  These can be necessary when debugging symbols are larger than what the tool binaries at
+the default install paths can handle.
+
+The system calls necessary for `gdb` and `rr` to function properly on the Linux host necessitate:
+   - `/proc/sys/kernel/yama/ptrace_scope` no higher than 0
+   - `/proc/sys/kernel/perf_event_paranoid` no higher than 1
+   
+These can be changed by editing the config files under `/etc/sysctl.*` and reloaded via `sysctl --system`.
+Doing this on the host machine should be effective for all containerized `gdb`/`rr` runs as well.
+
 ### GDB
 
 Start a debugger container.
@@ -176,3 +188,52 @@ Start a debugger container.
 
     run the client to invoke the API
 
+### RR
+
+   - [rr](http://github.com/mozilla/rr) is a GDB work-a-like which
+      * records the target process being run and allows replay (a "deterministic run") of that record
+      * can therefore capture an error and allow the developer step forward and backward through any of
+        the captured PIDs
+
+   - `rr` can be used within graphical environments like [gdbgui](https://gdbgui.com/)
+      * gdbgui is easy to [install](https://github.com/cs01/gdbgui/blob/master/docs/INSTALLATION.md)
+
+   - instructional links on
+
+      * [building and installing](https://github.com/mozilla/rr/wiki/Building-And-Installing)
+      * [using RR under docker](https://github.com/mozilla/rr/wiki/Docker)
+
+   - basic usage under iRODS:
+      - install an iRODS server with debug symbols compiled in.
+         (*Can insert **rodsLog(LOG_NOTICE,"...%s..",arg,...)** calls to help ascertaining relevant PID later)*
+      - as iRODS, do: `~/irodsctl stop`
+      - then, also as iRODS: `cd /usr/sbin ; rr record -w /usr/sbin/irodsServer`
+      - (as any user) perform the operations requiring troubleshooting
+      - again as iRODS, do: `~/irodsctl stop`
+      then:
+      ```
+      rr ps
+      rr replay -p <PID> # or if forked without exec, then "-f <PID>"
+      ```
+
+### Valgrind
+
+```
+# as service account
+ubuntu:~$ su - irods
+$ cd /var/lib/irods ; ./irodsctl stop
+$ cd ..         # Because iRODS can't find the server log otherwise
+
+Sample command line:
+```
+$ valgrind --tool=memcheck --leak-check=full --trace-children=yes \
+      --num-callers=200 --time-stamp=yes --track-origins=yes \
+      --keep-stacktraces=alloc-and-free --freelist-vol=10000000000 \
+      --log-file=$HOME/valgrind_out_%p.txt /usr/sbin/irodsServer
+```
+Then everything that happens in irodsServer will be valgrinded.
+#  ps -ef | grep valgrind -> yields PID(s); valgrind hides the process name
+```
+Other valgrind notes
+   - can kill valgrind/iRODS processes with `pkill valgrind`
+   - between server runs, be sure to `rm -fr /dev/shm/irods*`
