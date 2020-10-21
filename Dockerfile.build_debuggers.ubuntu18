@@ -4,45 +4,96 @@ FROM ${debugger_base}
 ARG parallelism=3
 ARG tools_prefix=/opt/debug_tools
 
-RUN apt update
-RUN apt install -y texinfo libncurses5-dev g++ wget make
-RUN apt install -y python-dev
-RUN apt remove  -y python3-dev
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p  ${tools_prefix}
 
 WORKDIR /tmp
 
-RUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz
+#--------
+# gdb
 
-RUN tar xzf gdb*gz && cd gdb*/ \
+RUN \
+  apt-get update && \
+  apt-get install -y \
+    texinfo \
+    libncurses5-dev \
+    g++ \
+    wget \
+    make \
+    python-dev \
+  && \
+  apt-get remove -y python3-dev && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/*
+
+RUN \
+  wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz \
+    && tar xzf gdb*.tar.gz \
+    && cd gdb*/ \
     && ./configure --prefix=${tools_prefix} --with-python --with-curses --enable-tui \
-    && make -j${parallelism}
-
-RUN cd gdb*/ && make install
+    && make -j${parallelism} \
+    && make install \
+    && cd .. \
+    && rm -rf gdb*.tar.gz gdb*/
 
 #--------
+# rr
 
 ARG rr_commit="4513b23c8092097dc42c73f3cbaf4cfaebd04efe"
 
-RUN apt-get install -y ccache cmake make g++-multilib gdb pkg-config \
-      coreutils python3-pexpect manpages-dev git ninja-build capnproto \
-      libcapnp-dev
+RUN \
+  apt-get update && \
+  apt-get install -y \
+    ccache \
+    cmake \
+    g++-multilib \
+    gdb \
+    pkg-config \
+    coreutils \
+    python3-pexpect \
+    manpages-dev \
+    git \
+    ninja-build \
+    capnproto \
+    libcapnp-dev \
+  && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN git clone http://github.com/mozilla/rr
-
-RUN cd rr && \
+RUN git clone http://github.com/mozilla/rr && \
+    cd rr && \
     { [ -z "${rr_commit}" ] || git checkout "${rr_commit}"; } && \
     mkdir ../obj && cd ../obj && \
-    cmake ../rr \
-    -DCMAKE_INSTALL_PREFIX:PATH=${tools_prefix} && \
+    export CCACHE_DISABLE=1 && \
+    cmake -DCMAKE_INSTALL_PREFIX:PATH=${tools_prefix} ../rr && \
     make -j${parallelism} && \
-    make install
+    make install && \
+    cd .. && \
+    rm -rf obj rr
 
-RUN wget  https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
+#--------
+# valgrind
 
-RUN tar xjf valgrind*bz2 && cd valgrind*/ && \
+RUN wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2 && \
+    tar xjf valgrind*tar.bz2 && \
+    cd valgrind*/ && \
+    export CCACHE_DISABLE=1 && \
     ./configure --prefix=${tools_prefix} && \
-    make -j${parallelism} install
+    make -j${parallelism} install && \
+    cd .. && \
+    rm -rf valgrind*tar.bz2 valgrind*/
 
-RUN apt install -y tmux vim nano tig
+#--------
+# utils
+
+RUN \
+  apt-get update && \
+  apt-get install -y \
+    tmux \
+    vim \
+    nano \
+    tig \
+  && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/*

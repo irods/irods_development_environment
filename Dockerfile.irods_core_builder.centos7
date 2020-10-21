@@ -3,18 +3,51 @@
 #
 FROM centos:7 as irods_common
 
-RUN yum update -y && \
-    yum install -y epel-release && \
-    yum install -y wget sudo \
-                   python python-psutil python-requests python-jsonschema \
-                   openssl openssl-devel super lsof postgresql-server unixODBC-devel libjson-perl
+SHELL [ "/usr/bin/bash", "-c" ]
+
+RUN \
+  yum check-update || [ "$?" -eq 100 ] && \
+  yum install -y \
+    epel-release \
+    sudo \
+    wget \
+  && \
+  yum clean all && \
+  rm -rf /var/cache/yum /tmp/*
+
+RUN \
+  yum check-update || [ "$?" -eq 100 ] && \
+  yum install -y \
+    python \
+    python2-psutil \
+    python-requests \
+    python2-jsonschema \
+    openssl \
+    openssl-devel \
+    super \
+    lsof \
+    postgresql-server \
+    unixODBC-devel \
+    libjson-perl \
+  && \
+  yum clean all && \
+  rm -rf /var/cache/yum /tmp/*
 
 RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     wget -qO - https://packages.irods.org/renci-irods.yum.repo | sudo tee /etc/yum.repos.d/renci-irods.yum.repo && \
     rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
     wget -qO - https://core-dev.irods.org/renci-irods-core-dev.yum.repo | sudo tee /etc/yum.repos.d/renci-irods-core-dev.yum.repo && \
-    yum update -y && \
-    yum install -y 'irods-externals*'
+    yum check-update -y || { rc=$?; [ "$rc" -eq 100 ] && exit 0; exit "$rc"; } && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
+RUN \
+  yum check-update || [ "$?" -eq 100 ] && \
+  yum install -y \
+    'irods-externals*' \
+  && \
+  yum clean all && \
+  rm -rf /var/cache/yum /tmp/*
 
 #
 # iRODS Packages Builder Base Image
@@ -22,10 +55,27 @@ RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
 FROM irods_common as irods_package_builder_base
 
 # Install iRODS dependencies.
-RUN yum update -y && \
-    yum install -y git ninja-build pam-devel krb5-devel fuse-devel which \
-                   libcurl-devel bzip2-devel libxml2-devel zlib-devel python-devel \
-                   make gcc-c++ help2man rpm-build
+RUN \
+  yum check-update || [ "$?" -eq 100 ] && \
+  yum install -y \
+    git \
+    ninja-build \
+    pam-devel \
+    krb5-devel \
+    fuse-devel \
+    which \
+    libcurl-devel \
+    bzip2-devel \
+    libxml2-devel \
+    zlib-devel \
+    python-devel \
+    make \
+    gcc-c++ \
+    help2man \
+    rpm-build \
+  && \
+  yum clean all && \
+  rm -rf /var/cache/yum /tmp/*
 
 #
 # iRODS Packages Builder Image
