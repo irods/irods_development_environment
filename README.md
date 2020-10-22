@@ -13,7 +13,8 @@ This repository contains tools for the running troubleshooting of a Docker-conta
       1. [`gdb`](#gdb)
       1. [`rr`](#rr)
       1. [`valgrind`](#valgrind)
-      1. ( `cppcheck`,  clang static analyzer, ... ?)
+      1. [`scan-build`](#scan-build)
+      1. ( `cppcheck`, ... ?)
 ---
 
 ## General Setup
@@ -237,3 +238,30 @@ Then everything that happens in irodsServer will be valgrinded.
 Other valgrind notes
    - can kill valgrind/iRODS processes with `pkill valgrind`
    - between server runs, be sure to `rm -fr /dev/shm/irods*`
+
+
+### scan-build
+
+The clang static analyzer can be used when building iRODS.
+
+ - Setup environment:
+
+   ```
+   export PATH=/opt/irods-externals/cmake3.11.4-0/bin:$PATH
+   export PATH=/opt/irods-externals/clang6.0-0/bin:$PATH
+   export CCC_CC=clang
+   export CCC_CXX=clang++
+
+ - Build with static analyzer:
+
+   ```
+   cmake -DCLANG_STATIC_ANALYZER=ON ..
+   scan-build make -j
+   ```
+
+   or
+
+   ```
+   cmake -DCLANG_STATIC_ANALYZER=ON -GNinja ..
+   scan-build ninja
+   ```
