@@ -1,6 +1,6 @@
 # iRODS Development Environment
 
-This repository contains tools for the running troubleshooting of a Docker-containerized iRODS server.
+This repository contains tools for the running and troubleshooting of a Docker-containerized iRODS server.
 
 ## Contents of this Guide
    1. [General Setup](#general-setup)
