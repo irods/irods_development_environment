@@ -163,7 +163,7 @@ The system calls necessary for `gdb` and `rr` to function properly on the Linux 
 These can be changed by editing the config files under `/etc/sysctl.*` and reloaded via `sysctl --system`.
 Doing this on the host machine should be effective for all containerized `gdb`/`rr` runs as well.
 
-### GDB
+### gdb
 
 Start a debugger container.
 
@@ -189,7 +189,7 @@ Start a debugger container.
 
     run the client to invoke the API
 
-### RR
+### rr
 
    - [rr](http://github.com/mozilla/rr) is a GDB work-a-like which
       * records the target process being run and allows replay (a "deterministic run") of that record
@@ -217,7 +217,7 @@ Start a debugger container.
       rr replay -p <PID> # or if forked without exec, then "-f <PID>"
       ```
 
-### Valgrind
+### valgrind
 
 ```
 # as service account
