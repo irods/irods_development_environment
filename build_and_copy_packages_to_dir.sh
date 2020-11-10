@@ -24,19 +24,21 @@ else
     DISTRIBUTION="unknown"
 fi
 
-server_only=0
+core_only=0
 make_program="make"
 make_program_config=""
 build_jobs=0
 debug_config=""
+unit_test_config="-DIRODS_UNIT_TESTS_BUILD=YES"
 
 while [ -n "$1" ]; do
     case "$1" in
-        --server-only)           server_only=1;;
+        --core-only)             core_only=1;;
         -N|--ninja)              make_program_config="-GNinja";
                                  make_program="ninja";;
         -j|--jobs)               shift; build_jobs=$(($1 + 0));;
         -d|--debug)              debug_config="-DCMAKE_BUILD_TYPE=Debug";;
+        --exclude-unit-tests)    unit_test_config="-DIRODS_UNIT_TESTS_BUILD=NO";;
         -h|--help)               usage;;
     esac
     shift
@@ -50,7 +52,7 @@ echo "========================================="
 
 # Build iRODS
 mkdir -p /irods_build && cd /irods_build
-cmake ${make_program_config} ${debug_config} /irods_source
+cmake ${make_program_config} ${debug_config} ${unit_test_config} /irods_source
 if [[ -z ${build_jobs} ]]; then
     ${make_program} package
 else
@@ -66,7 +68,7 @@ elif [ "${DISTRIBUTION}" == "debian" ] ; then
 fi
 
 # stop if --server-only option was used
-if [[ ${server_only} -gt 0 ]]; then
+if [[ ${core_only} -gt 0 ]]; then
     exit
 fi
 
