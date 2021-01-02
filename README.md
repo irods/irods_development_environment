@@ -15,6 +15,7 @@ This repository contains tools for the running and troubleshooting of a Docker-c
       1. [`valgrind`](#valgrind)
       1. [`scan-build`](#scan-build)
       1. ( `cppcheck`, ... ?)
+   1. [Enabling GDB-style pretty printers](#enabling-gdb-style-pretty-printers)
 ---
 
 ## General Setup
@@ -265,3 +266,51 @@ The clang static analyzer can be used when building iRODS.
    cmake -DCLANG_STATIC_ANALYZER=ON -GNinja ..
    scan-build ninja
    ```
+---
+
+## Enabling GDB-style pretty printers
+
+Run the provided script to enable debug libraries and pretty printing for the libcxx versions of STL containers.
+
+```
+root@399b4ef584a7:~# bash /koutheir-pretty-printers.sh
+	...
+--> Checking out llvm and building debug libraries for cxx and cxxabi.
+	...
+--> Writing debug shared objects.
+	...
+--> Creating /root/.gdbinit for gdb and rr.
+	...
+```
+Then, to verify, using this file, `demo.cc`:
+```
+#include <map>
+#include <string>
+int main()
+{
+  std::map<std::string,std::string> mymap {
+      {"key1","value1"}, {"key2","value2"}
+  };
+  return 0; // In rr or gdb, place breakpoint here and examine `mymap'
+}
+```
+compile:
+```
+root@399b4ef584a7:/# /opt/irods-externals/clang6.0-0/bin/clang++ -Wl,-rpath -Wl,/opt/irods-externals/clang-runtime6.0-0/lib -stdlib=libc++ demo.cc  -g
+```
+and in GDB or RR, run the program. After breaking at the `return 0;` statement, look at the **map<string,string>** variable - first using the pretty printers,
+and then raw - to observe the difference.
+```
+root@399b4ef584a7:/# /opt/debug_tools/bin/gdb a.out
+(gdb) b <line # of return statement>
+(gdb) r
+(gdb) p mymap
+$1 = std::__1::map (count=2) = {[0] "key1" = "value1", [1] "key2" = "value
+
+(gdb) p /r mymap
+$2 = {__tree_ = {__begin_node_ = 0x608010,
+  __pair1_ = {<std::__1::__compressed_pair_elem<std::__1::__tree_end_node<std::__1::__tree_node_base<void*>*>, 0, false>> = {__value_ = {         __left_ = 0x608010}}, <std::__1::__compressed_pair_elem<std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char>, ...
+          ( ... more gobbledygook ...)
+  <No data fields>}, <No data fields>}}}
+```
+Fortunately, the pretty printers support the great majority of data structures commonly used in iRODS code (that is: map, list, vector, string, etc.).
