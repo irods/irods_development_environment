@@ -48,6 +48,7 @@ RUN \
   rm -rf /var/lib/apt/lists/* /tmp/*
 
 ADD ICAT.sql /
+ADD koutheir-pretty-printers.sh /
 ADD keep_alive.sh /keep_alive.sh
 RUN chmod +x /keep_alive.sh
 ENTRYPOINT ["/keep_alive.sh"]
