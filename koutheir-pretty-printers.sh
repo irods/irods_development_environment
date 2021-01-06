@@ -1,23 +1,33 @@
 #!/bin/bash
 
+if [ ${CHK-1} ] ; then
 [ $(id -u) = 0 ] || { echo "Please run this script as root." >&2; exit 1; }
+fi
 
-CLANG_VERSION="6.0-0"
-CMAKE_PREFIX="/opt/irods-externals/cmake"
-LLVM_VERSION="6.0.0"
-LIBCXX_PRETTY_PRINTERS_COMMIT="5ffbf2487bf8da7f08bc1c8650a4396d2ff15403"
+# -- BEGIN CONFIGURATION OPTIONS --
 
 CMAKE_PREFIX="/opt/irods-externals/cmake"
 CLANG_PREFIX="/opt/irods-externals/clang"
 CLANG_RUNTIME_PREFIX="/opt/irods-externals/clang-runtime"
 
-# package_max_version determine the maximum of several versions of a package in iRODS externals
+declare -A LLVM_TO_KOUTHEIR_VERSION_LOOKUP=(
+    ["6.0.0"]="5ffbf2487bf8da7f08bc1c8650a4396d2ff15403"
+)
 
+# -- END CONFIGURATION OPTIONS --
+
+#
+# package_max_version determine the maximum of several versions of a package in iRODS externals
+#
 package_max_version() (  # deliberate subshell
     [ -z "$1" ] && exit
     PACKAGE_PREFIX=$1
     shopt -s nullglob
-    version_string_pattern="[0-9][-.0-9]*"
+    if [ -n "$2" ]; then
+      version_string_pattern="$2"
+    else
+      version_string_pattern="[0-9][-.0-9]*"
+    fi
     max=""
     paths=( ${PACKAGE_PREFIX}${version_string_pattern} )
     [ ${#paths[*]} -gt 0 ] && \
@@ -27,7 +37,7 @@ package_max_version() (  # deliberate subshell
     echo $max
 )
 
-get_max() {
+get_max() { # -- get max of two (X,Y,Z) tuples --
     local z y=0 gt=""
     local IFS=".-"  # for splitting version numbers of the form "X[-.]Y..." into (X,Y,...)
     read -a z <<<"$2"
@@ -36,9 +46,21 @@ get_max() {
                   else echo "$2"; fi
 }
 
+CLANG_VERSION=$(package_max_version $CLANG_PREFIX)
+if [ -z "$CLANG_VERSION" ] ; then
+  echo >&2 "ERROR - no Clang compiler found among installed irods-externals*"
+  exit 2
+fi
+LLVM_VERSION=$(echo "$CLANG_VERSION" | sed 's/[-.]/./g')
+
+LIBCXX_PRETTY_PRINTERS_COMMIT=${LLVM_TO_KOUTHEIR_VERSION_LOOKUP[$LLVM_VERSION]}
+
+if [ -z "$LIBCXX_PRETTY_PRINTERS_COMMIT" ]; then
+  echo >&2 "WARNING - no optimal version of libc++ Pretty-Printers found."
+  echo >&2 "          Using the default branch"
+fi
+
 LATEST_CLANG_RUNTIME=$(package_max_version $CLANG_RUNTIME_PREFIX)
-echo $Y
-exit 0;
 
 if [ -x /usr/bin/zypper ] ;then
   pkgtool=zypper # SuSE
@@ -61,7 +83,7 @@ ${pkgtool} install -y make git python python3
 
 echo >&2 -e "\n--> Checking out llvm and building debug libraries for cxx and cxxabi.\n"
 
-CMAKE_VERSION=$(cmake_max_version)
+CMAKE_VERSION=$(package_max_version $CMAKE_PREFIX)
 
 if [ -n "${CMAKE_VERSION}" ]; then
     cd ~ ; git clone http://github.com/llvm/llvm-project
@@ -89,9 +111,15 @@ done
 
 # Install & configure pretty-printers
 
+if [ -z "${LIBCXX_PRETTY_PRINTERS_COMMIT}" ]; then
+    GIT_PPRINTER_CHECKOUT_CMD=":"
+else
+    GIT_PPRINTER_CHECKOUT_CMD="git checkout '${LIBCXX_PRETTY_PRINTERS_COMMIT}'"
+fi
+
 echo >&2 -e "\n--> Creating $HOME/.gdbinit for gdb and rr.\n"
 cd ~ ; git clone https://github.com/koutheir/libcxx-pretty-printers
-cd libcxx-pretty-printers && git checkout "${LIBCXX_PRETTY_PRINTERS_COMMIT}"
+cd libcxx-pretty-printers && eval "$GIT_PPRINTER_CHECKOUT_CMD"
 PP_SRC_DIR=~/libcxx-pretty-printers/src
 cp $PP_SRC_DIR/gdbinit ~/.gdbinit && sed -i -e "s@<path.*>@$PP_SRC_DIR@" ~/.gdbinit
 
