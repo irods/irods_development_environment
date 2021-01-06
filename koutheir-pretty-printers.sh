@@ -7,26 +7,38 @@ CMAKE_PREFIX="/opt/irods-externals/cmake"
 LLVM_VERSION="6.0.0"
 LIBCXX_PRETTY_PRINTERS_COMMIT="5ffbf2487bf8da7f08bc1c8650a4396d2ff15403"
 
-# determine maximum cmake version provided by iRODS externals
+CMAKE_PREFIX="/opt/irods-externals/cmake"
+CLANG_PREFIX="/opt/irods-externals/clang"
+CLANG_RUNTIME_PREFIX="/opt/irods-externals/clang-runtime"
 
-cmake_max_version() (
+# package_max_version determine the maximum of several versions of a package in iRODS externals
+
+package_max_version() (  # deliberate subshell
+    [ -z "$1" ] && exit
+    PACKAGE_PREFIX=$1
     shopt -s nullglob
+    version_string_pattern="[0-9][-.0-9]*"
     max=""
-    paths=(${CMAKE_PREFIX}*.*.*-*)
+    paths=( ${PACKAGE_PREFIX}${version_string_pattern} )
     [ ${#paths[*]} -gt 0 ] && \
     for y in ${paths[*]}; do
-        max=$(get_max "${y#${CMAKE_PREFIX}}" "$max")
+        max=$(get_max "${y#${PACKAGE_PREFIX}}" "$max")
     done
     echo $max
 )
 
 get_max() {
-    local z y=0 IFS=".-"; gt=""
+    local z y=0 gt=""
+    local IFS=".-"  # for splitting version numbers of the form "X[-.]Y..." into (X,Y,...)
     read -a z <<<"$2"
     for x in ${1}; do [ ${x:-0} -gt ${z[$((y++))]:-0} ] && gt=1; done
     if [ "$gt" ]; then echo "$1"
                   else echo "$2"; fi
 }
+
+LATEST_CLANG_RUNTIME=$(package_max_version $CLANG_RUNTIME_PREFIX)
+echo $Y
+exit 0;
 
 if [ -x /usr/bin/zypper ] ;then
   pkgtool=zypper # SuSE
