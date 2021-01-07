@@ -46,14 +46,14 @@ package_max_version() (  # deliberate subshell
     for y in ${paths[*]}; do
         max=$(get_max "${y#${PACKAGE_PREFIX}}" "$max")
     done
-    echo $max
+    echo "$max"
 )
 
 get_max() { # -- get max of two (X,Y,Z) tuples --
     local z y=0 gt=""
     local IFS=".-"  # for splitting version numbers of the form "X[-.]Y..." into (X,Y,...)
     read -a z <<<"$2"
-    for x in ${1}; do [ ${x:-0} -gt ${z[$((y++))]:-0} ] && gt=1; done
+    for x in ${1}; do [ "${x:-0}" -gt "${z[$((y++))]:-0}" ] && gt=1; done
     if [ "$gt" ]; then echo "$1"
                   else echo "$2"; fi
 }
@@ -65,7 +65,7 @@ if [ -z "$CLANG_VERSION" ] ; then
   exit 2
 fi
 
-LLVM_VERSION=$(echo "$CLANG_VERSION" | sed 's/[-.]/./g')
+LLVM_VERSION=${CLANG_VERSION//[-.]/.}
 
 LIBCXX_PRETTY_PRINTERS_COMMIT=${LLVM_TO_KOUTHEIR_VERSION_LOOKUP[$LLVM_VERSION]}
 
@@ -122,10 +122,10 @@ fi
 if [ -n "${CMAKE_VERSION}" ]; then
     cd ~ ; git clone http://github.com/llvm/llvm-project
     cd llvm-project && \
-    git checkout llvmorg-${LLVM_VERSION} && \
+    git checkout "llvmorg-${LLVM_VERSION}" && \
     mkdir build && \
     cd build && \
-    ${CMAKE_PREFIX}${CMAKE_VERSION}/bin/cmake \
+    "${CMAKE_PREFIX}${CMAKE_VERSION}/bin/cmake" \
         -G "Unix Makefiles"  -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi" ../llvm && \
     make -j7 cxx cxxabi
 else
