@@ -1,11 +1,14 @@
 #!/bin/bash
 
-if [ ${CHK-1} ] ; then
-[ $(id -u) = 0 ] || { echo "Please run this script as root." >&2; exit 1; }
+# ***** While CHECK_* macros are still here, we are still testing :) .
+
+if [ -n "${CHECK_USER-1}" ] ; then # TODO - remove this if clause
+  [ $(id -u) = 0 ] || { echo "Please run this script as root." >&2; exit 1; }
 fi
 
-# -- BEGIN CONFIGURATION OPTIONS --
+# -- Configuration Values.
 
+CLANG_VERSION_HINT="6.*"
 CMAKE_PREFIX="/opt/irods-externals/cmake"
 CLANG_PREFIX="/opt/irods-externals/clang"
 CLANG_RUNTIME_PREFIX="/opt/irods-externals/clang-runtime"
@@ -14,10 +17,19 @@ declare -A LLVM_TO_KOUTHEIR_VERSION_LOOKUP=(
     ["6.0.0"]="5ffbf2487bf8da7f08bc1c8650a4396d2ff15403"
 )
 
-# -- END CONFIGURATION OPTIONS --
+# -- Process Command Line Options.
+
+eval "set --$(/usr/bin/getopt --longoptions "clang-version-hint:" --options "c:" -- "$@")"
+for option in "$@"; do
+    case $option in 
+        --clang-version-hint|-c) CLANG_VERSION_HINT=$2 ; shift 2 ;;
+        *) shift; break;;
+    esac
+done
 
 #
-# package_max_version determine the maximum of several versions of a package in iRODS externals
+# -- Function package_max_version
+#    To determine the maximum of several versions of a package in iRODS externals
 #
 package_max_version() (  # deliberate subshell
     [ -z "$1" ] && exit
@@ -46,30 +58,30 @@ get_max() { # -- get max of two (X,Y,Z) tuples --
                   else echo "$2"; fi
 }
 
-CLANG_VERSION=$(package_max_version $CLANG_PREFIX)
+CLANG_VERSION=$(package_max_version $CLANG_PREFIX "$CLANG_VERSION_HINT")
+
 if [ -z "$CLANG_VERSION" ] ; then
   echo >&2 "ERROR - no Clang compiler found among installed irods-externals*"
   exit 2
 fi
+
 LLVM_VERSION=$(echo "$CLANG_VERSION" | sed 's/[-.]/./g')
 
 LIBCXX_PRETTY_PRINTERS_COMMIT=${LLVM_TO_KOUTHEIR_VERSION_LOOKUP[$LLVM_VERSION]}
 
 if [ -z "$LIBCXX_PRETTY_PRINTERS_COMMIT" ]; then
-  echo >&2 "WARNING - no optimal version of libc++ Pretty-Printers found."
-  echo >&2 "          Using the default branch"
+    echo >&2 "WARNING - no optimal version of libc++ Pretty-Printers found."
+    echo >&2 "          Using the default branch"
 fi
 
-LATEST_CLANG_RUNTIME=$(package_max_version $CLANG_RUNTIME_PREFIX)
-
 if [ -x /usr/bin/zypper ] ;then
-  pkgtool=zypper # SuSE
+    pkgtool=zypper # SuSE
 elif [ -x /usr/bin/yum ]; then
-  pkgtool=yum    # CentOS, RHEL
-  yum install -y epel-release
+    pkgtool=yum    # CentOS, RHEL
+    yum install -y epel-release
 else
-  pkgtool=apt    # Debian, Ubuntu
-  apt update
+    pkgtool=apt    # Debian, Ubuntu
+    apt update
 fi
 
 # Need: 
@@ -84,6 +96,28 @@ ${pkgtool} install -y make git python python3
 echo >&2 -e "\n--> Checking out llvm and building debug libraries for cxx and cxxabi.\n"
 
 CMAKE_VERSION=$(package_max_version $CMAKE_PREFIX)
+CLANG_PATH=${CLANG_PREFIX}${CLANG_VERSION}
+CLANG_RUNTIME_PATH=${CLANG_RUNTIME_PREFIX}${CLANG_VERSION}
+
+
+if [ ! -d "$CLANG_RUNTIME_PATH" ]; then
+    echo >&2 "Warning - No clang runtime corresponding to clang '${CLANG_VERSION}'."
+    echo >&2 "          Please install it before running this script."
+    exit 3
+fi
+
+CMAKE_VERSION=$(package_max_version $CMAKE_PREFIX)
+
+#
+#  Print debug values and quit if requested by CHECK_QUIT != "" - TODO - remove this
+#
+if [ -n "${CHECK_QUIT}" ] ; then
+    echo CMAKE_VERSION  "($CMAKE_VERSION)"
+    echo CLANG_PATH  "($CLANG_PATH)"
+    echo CLANG_RUNTIME_PATH  "($CLANG_RUNTIME_PATH)"
+    echo LIBCXX_PRETTY_PRINTERS_COMMIT "($LIBCXX_PRETTY_PRINTERS_COMMIT)"
+    exit 10
+fi
 
 if [ -n "${CMAKE_VERSION}" ]; then
     cd ~ ; git clone http://github.com/llvm/llvm-project
@@ -95,11 +129,11 @@ if [ -n "${CMAKE_VERSION}" ]; then
         -G "Unix Makefiles"  -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi" ../llvm && \
     make -j7 cxx cxxabi
 else
-    echo >&2 "Need at least one irods-externals-cmake* package installed"
-    exit 1
+    echo >&2 "Error - Need at least one irods-externals-cmake* package installed"
+    exit 4
 fi
 
-# backup existing shared objects and copy in the debug versions
+# -- Backup existing shared objects and copy debug versions in to replace them.
 
 echo >&2 -e "\n--> Writing debug shared objects.\n"
 for SHLIB in lib/libc++*.so*; do
@@ -109,7 +143,7 @@ for SHLIB in lib/libc++*.so*; do
     done
 done
 
-# Install & configure pretty-printers
+# -- Install & configure pretty-printers
 
 if [ -z "${LIBCXX_PRETTY_PRINTERS_COMMIT}" ]; then
     GIT_PPRINTER_CHECKOUT_CMD=":"
@@ -118,8 +152,18 @@ else
 fi
 
 echo >&2 -e "\n--> Creating $HOME/.gdbinit for gdb and rr.\n"
-cd ~ ; git clone https://github.com/koutheir/libcxx-pretty-printers
-cd libcxx-pretty-printers && eval "$GIT_PPRINTER_CHECKOUT_CMD"
-PP_SRC_DIR=~/libcxx-pretty-printers/src
-cp $PP_SRC_DIR/gdbinit ~/.gdbinit && sed -i -e "s@<path.*>@$PP_SRC_DIR@" ~/.gdbinit
 
+cd ~ ; git clone https://github.com/koutheir/libcxx-pretty-printers
+
+if cd libcxx-pretty-printers
+then
+    if ! eval "$GIT_PPRINTER_CHECKOUT_CMD" ; then
+        echo >&2 "Error - Could not find pretty printers repository directory."
+        exit 5
+    fi
+    PP_SRC_DIR=~/libcxx-pretty-printers/src
+    cp $PP_SRC_DIR/gdbinit ~/.gdbinit && sed -i -e "s@<path.*>@$PP_SRC_DIR@" ~/.gdbinit
+else
+    echo >&2 "Error - Could not find pretty printers repository directory."
+    exit 6
+fi
