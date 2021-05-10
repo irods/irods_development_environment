@@ -224,7 +224,7 @@ Start a debugger container.
 ubuntu:~$ su - irods
 $ cd /var/lib/irods ; ./irodsctl stop
 $ cd ..         # Because iRODS can't find the server log otherwise
-
+```
 Sample command line:
 ```
 $ valgrind --tool=memcheck --leak-check=full --trace-children=yes \
@@ -233,6 +233,7 @@ $ valgrind --tool=memcheck --leak-check=full --trace-children=yes \
       --log-file=$HOME/valgrind_out_%p.txt /usr/sbin/irodsServer
 ```
 Then everything that happens in irodsServer will be valgrinded.
+```
 #  ps -ef | grep valgrind -> yields PID(s); valgrind hides the process name
 ```
 Other valgrind notes
