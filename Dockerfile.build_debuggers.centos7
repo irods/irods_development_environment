@@ -104,7 +104,6 @@ RUN git clone http://github.com/mozilla/rr && \
     && \
     /opt/irods-externals/cmake3.11.4-0/bin/cmake \
       -DCMAKE_INSTALL_PREFIX:PATH="${tools_prefix}" \
-      -GNinja \
       ../rr \
     && \
     /opt/irods-externals/cmake3.11.4-0/bin/cmake --build . --target install -- -j${parallelism}
