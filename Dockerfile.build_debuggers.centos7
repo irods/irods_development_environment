@@ -14,7 +14,7 @@ WORKDIR /tmp
 # TODO: Figure out what section these go in
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     epel-release \
     sudo \
@@ -25,7 +25,7 @@ RUN \
   rm -rf /var/cache/yum /tmp/*
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     python3 \
     ccache \
@@ -48,7 +48,7 @@ RUN \
   rm -rf /var/cache/yum /tmp/*
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     python3-pip \
   && \
@@ -63,7 +63,7 @@ RUN pip3 --no-cache-dir install pexpect
 ARG rr_commit="4513b23c8092097dc42c73f3cbaf4cfaebd04efe"
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     capnproto \
     capnproto-devel \
@@ -82,7 +82,7 @@ RUN rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
     rm -rf /var/cache/yum /tmp/*
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     irods-externals-clang-runtime6.0-0 \
     irods-externals-clang6.0-0 \
@@ -113,7 +113,7 @@ RUN git clone http://github.com/mozilla/rr && \
 # gdb
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     texinfo \
   && \
@@ -135,7 +135,7 @@ RUN \
 # valgrind
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     bzip2 \
   && \
@@ -155,7 +155,7 @@ RUN wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2 && \
 # utils
 
 RUN \
-  yum check-update || [ "$?" -eq 100 ] && \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     nano \
     vim-enhanced \
