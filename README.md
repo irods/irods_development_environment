@@ -266,3 +266,26 @@ The clang static analyzer can be used when building iRODS.
    cmake -DCLANG_STATIC_ANALYZER=ON -GNinja ..
    scan-build ninja
    ```
+
+## How to Build an iRODS Plugin
+
+The plugin builder functions very similarly to the core builder.
+
+In addition to the build and package volume mounts, there also needs to be a volume mount for iRODS core packages (i.e. irods-dev and irods-runtime) so that the plugin can install dependencies.
+
+Build the plugin builder like this (use whatever image tag that you wish):
+```bash
+docker build -f plugin_builder.ubuntu16.Dockerfile -t irods-plugin-builder:ubuntu-16.04 .
+docker build -f plugin_builder.ubuntu18.Dockerfile -t irods-plugin-builder:ubuntu-18.04 .
+docker build -f plugin_builder.centos7.Dockerfile -t irods-plugin-builder:centos-7 .
+```
+
+And run the plugin builder like this, e.g. ubuntu:16.04:
+```bash
+docker run --rm \
+           -v /full/path/to/irods_plugin_repository_clone:/irods_plugin_source \
+           -v /full/path/to/plugin_build_output_dir:/irods_plugin_build \
+           -v /full/path/to/plugin_packages_output_dir:/irods_plugin_packages \
+           -v /full/path/to/built_irods_packages_dir:/irods_packages \
+           irods-plugin-builder:ubuntu-16.04 --build_directory /irods_plugin_build
+```
