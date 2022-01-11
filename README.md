@@ -33,18 +33,17 @@ $ mkdir /full/path/to/irods_build_output_dir
 $ mkdir /full/path/to/icommands_build_output_dir
 $ mkdir /full/path/to/packages_output_dir
 ```
-Note: It may be useful to keep separate build directories across OS flavors in order to ensure
-correctness of builds.
+Note: It may be useful to keep separate build directories across OS flavors and iRODS branches in order to ensure correctness of builds.
 
 3. Build the Docker images:
 ```
 $ cd /full/path/to/irods_development_environment_repository_clone
-$ docker build -f Dockerfile.irods_core_builder.centos7 -t irods-core-builder-centos7 .
-$ docker build -f Dockerfile.irods_core_builder.ubuntu16 -t irods-core-builder-ubuntu16 .
-$ docker build -f Dockerfile.irods_core_builder.ubuntu18 -t irods-core-builder-ubuntu18 .
-$ docker build -f Dockerfile.irods_runner.centos7 -t irods-runner-centos7 .
-$ docker build -f Dockerfile.irods_runner.ubuntu16 -t irods-runner-ubuntu16 .
-$ docker build -f Dockerfile.irods_runner.ubuntu18 -t irods-runner-ubuntu18 .
+$ docker build -f irods_core_builder.centos7.Dockerfile -t irods-core-builder-centos7 .
+$ docker build -f irods_core_builder.ubuntu16.Dockerfile -t irods-core-builder-ubuntu16 .
+$ docker build -f irods_core_builder.ubuntu18.Dockerfile -t irods-core-builder-ubuntu18 .
+$ docker build -f irods_runner.centos7.Dockerfile -t irods-runner-centos7 .
+$ docker build -f irods_runner.ubuntu16.Dockerfile -t irods-runner-ubuntu16 .
+$ docker build -f irods_runner.ubuntu18.Dockerfile -t irods-runner-ubuntu18 .
 ```
 
 ### How to build (e.g. Ubuntu 16)
@@ -59,14 +58,16 @@ $ docker run --rm \
              irods-core-builder-ubuntu16
 ```
 
-Usage notes (available by running the above with -h):
+Usage notes (available by running the above docker container with -h):
 ```
 Builds iRODS repository, installs the dev/runtime packages, and then builds iCommands
 
 Available options:
 
-    --server-only           Only builds the server
-    -j, --jobs              Number of jobs to use with make
+    --core-only             Only builds the core
+    -d, --debug             Build with symbols for debugging
+    -j, --jobs              Number of jobs for make tool
+    -N, --ninja             Use ninja builder as the make tool
     -h, --help              This message
 ```
 

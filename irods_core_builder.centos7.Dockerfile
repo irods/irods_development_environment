@@ -9,7 +9,6 @@ RUN \
   yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     epel-release \
-    sudo \
     wget \
   && \
   yum clean all && \
@@ -47,9 +46,9 @@ RUN python3 -m pip install distro
 RUN python3 -m pip install jsonschema
 
 RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
-    wget -qO - https://packages.irods.org/renci-irods.yum.repo | sudo tee /etc/yum.repos.d/renci-irods.yum.repo && \
+    wget -qO - https://packages.irods.org/renci-irods.yum.repo | tee /etc/yum.repos.d/renci-irods.yum.repo && \
     rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
-    wget -qO - https://core-dev.irods.org/renci-irods-core-dev.yum.repo | sudo tee /etc/yum.repos.d/renci-irods-core-dev.yum.repo && \
+    wget -qO - https://core-dev.irods.org/renci-irods-core-dev.yum.repo | tee /etc/yum.repos.d/renci-irods-core-dev.yum.repo && \
     yum check-update -y || { rc=$?; [ "$rc" -eq 100 ] && exit 0; exit "$rc"; } && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
