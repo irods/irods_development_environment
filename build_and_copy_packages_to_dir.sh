@@ -1,5 +1,7 @@
 #! /bin/bash -e
 
+set -x
+
 usage() {
 cat <<_EOF_
 Builds iRODS repository, installs the dev/runtime packages, and then builds iCommands
@@ -10,18 +12,28 @@ Available options:
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
     -N, --ninja             Use ninja builder as the make tool
+    --exclude-unit-tests    Indicates that iRODS unit tests should not be built
+    --custom-externals      Path to custom externals packages received via volume mount
     -h, --help              This message
 _EOF_
     exit
 }
 
-# Detect distribution
-if [ -e /etc/redhat-release ] ; then
-    DISTRIBUTION="centos"
-elif [ -e /etc/lsb-release ] ; then
-    DISTRIBUTION="debian"
-else
-    DISTRIBUTION="unknown"
+if [[ -z ${file_extension} ]] ; then
+    echo "\$file_extension not defined"
+    exit 1
+fi
+
+install_command=""
+if [ "${file_extension}" == "rpm" ] ; then
+    install_command="yum install -y"
+elif [ "${file_extension}" == "deb" ] ; then
+    install_command="apt install -fy --allow-downgrades"
+fi
+
+if [[ -z ${install_command} ]] ; then
+    echo "platform unsupported"
+    exit 1
 fi
 
 core_only=0
@@ -30,6 +42,7 @@ make_program_config=""
 build_jobs=0
 debug_config=""
 unit_test_config="-DIRODS_UNIT_TESTS_BUILD=YES"
+custom_externals=""
 
 while [ -n "$1" ] ; do
     case "$1" in
@@ -39,10 +52,15 @@ while [ -n "$1" ] ; do
         -j|--jobs)               shift; build_jobs=$(($1 + 0));;
         -d|--debug)              debug_config="-DCMAKE_BUILD_TYPE=Debug";;
         --exclude-unit-tests)    unit_test_config="-DIRODS_UNIT_TESTS_BUILD=NO";;
+        --custom-externals)      shift; custom_externals=$1;;
         -h|--help)               usage;;
     esac
     shift
 done
+
+if [[ ! -z ${custom_externals} ]] ; then
+    ${install_command} "${custom_externals}"/irods-externals-*."${file_extension}"
+fi
 
 build_jobs=$(( !build_jobs ? $(nproc) - 1 : build_jobs )) #prevent maxing out CPUs
 
@@ -61,11 +79,7 @@ else
 fi
 
 # Copy packages to mounts
-if [ "${DISTRIBUTION}" == "centos" ] ; then
-    cp -r /irods_build/*.rpm /irods_packages/
-elif [ "${DISTRIBUTION}" == "debian" ] ; then
-    cp -r /irods_build/*.deb /irods_packages/
-fi
+cp -r /irods_build/*."${file_extension}" /irods_packages/
 
 # stop if --core-only option was used
 if [[ ${core_only} -gt 0 ]] ; then
@@ -77,11 +91,7 @@ echo "beginning build of iCommands"
 echo "========================================="
 
 # Install packages for building iCommands
-if [ "${DISTRIBUTION}" == "centos" ] ; then
-    rpm -i irods-{runtime,devel}*.rpm
-elif [ "${DISTRIBUTION}" == "debian" ] ; then
-    dpkg -i irods-{runtime,dev}*.deb
-fi
+${install_command} /irods_packages/irods-{runtime,dev}*."${file_extension}"
 
 # Build iCommands
 mkdir -p /icommands_build && cd /icommands_build
@@ -94,8 +104,4 @@ else
 fi
 
 # Copy packages to mounts
-if [ "${DISTRIBUTION}" == "centos" ] ; then
-    cp -r /icommands_build/*.rpm /irods_packages/
-elif [ "${DISTRIBUTION}" == "debian" ] ; then
-    cp -r /icommands_build/*.deb /irods_packages/
-fi
+cp -r /icommands_build/*."${file_extension}" /irods_packages/

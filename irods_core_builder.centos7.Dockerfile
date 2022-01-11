@@ -1,7 +1,4 @@
-#
-# iRODS Common
-#
-FROM centos:7 as irods_common
+FROM centos:7
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
@@ -61,12 +58,8 @@ RUN \
   yum clean all && \
   rm -rf /var/cache/yum /tmp/*
 
-#
-# iRODS Packages Builder Base Image
-#
-FROM irods_common as irods_package_builder_base
-
-# Install iRODS dependencies.
+# NOTE: This step cannot be combined with the installation step(s) above. Certain packages will
+# not be installed until certain other packages are installed. It's very sad and confusing.
 RUN \
   yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
@@ -85,14 +78,10 @@ RUN \
     gcc-c++ \
     help2man \
     rpm-build \
+    sudo \
   && \
   yum clean all && \
   rm -rf /var/cache/yum /tmp/*
-
-#
-# iRODS Packages Builder Image
-#
-FROM irods_package_builder_base as irods_package_builder
 
 ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH ${cmake_path}:$PATH
@@ -100,12 +89,8 @@ ENV PATH ${cmake_path}:$PATH
 ARG clang_path="/opt/irods-externals/clang6.0-0/bin"
 ENV PATH ${clang_path}:$PATH
 
-ADD build_and_copy_packages_to_dir.sh /
+ENV file_extension "rpm"
+
+COPY build_and_copy_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_packages_to_dir.sh
 ENTRYPOINT ["./build_and_copy_packages_to_dir.sh"]
-
-
-# How to use:
-# ./build_image.sh
-# docker run --rm -v /host/path/to/irods_source:/irods_source -v /host/path/to/irods_build:/irods_build -v /host/path/to/icommands_source:/icommands_source -v /host/path/to/icommands_build:/icommands_build -v /host/path/to/irods_packages:/irods_packages irods-core-builder
-

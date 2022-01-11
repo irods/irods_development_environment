@@ -68,8 +68,11 @@ Available options:
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
     -N, --ninja             Use ninja builder as the make tool
+    --exclude-unit-tests    Indicates that iRODS unit tests should not be built
+    --custom-externals      Path to custom externals packages received via volume mount
     -h, --help              This message
 ```
+The `--custom-externals` option allows you to specify a location in the builder container where there are built iRODS externals. This is useful if the platform does not have built externals available in the RENCI repositories or when trying out a modification to the externals. To do this, use a volume mount when running the docker container and specify the mount name with this option (i.e. the path inside the container).
 
 ### How to run (e.g. Ubuntu 16)
 1. Run iRODS Runner container:
@@ -290,3 +293,45 @@ docker run --rm \
            -v /full/path/to/built_irods_packages_dir:/irods_packages \
            irods-plugin-builder:ubuntu-16.04 --build_directory /irods_plugin_build
 ```
+
+## How to Build iRODS externals
+
+The externals builder builds externals packages which are needed to build iRODS and its affiliated plugins.
+
+Build the externals builder like this (use whatever image tag that you wish):
+```bash
+docker build -f externals_builder.<platform>.Dockerfile -t irods-externals-builder-m:<platform> .
+```
+
+Run the externals builder like this:
+```bash
+docker run --rm \
+           -v /full/path/to/externals/packages/output/directory:/irods_externals_packages \
+           irods-externals-builder-m:<platform>
+```
+
+Usage notes:
+```bash
+Builds iRODS externals and copies the packages to a volume mount (/irods_externals_packages)
+
+Available options:
+
+    --git-repository    URL or full path to the externals repository in the container (default: https://github.com/irods/externals)
+    -b, --branch        Branch to build in git repository (default: main)
+    -t, --make-target   The Make target to build (default: all)
+    -h, --help          This message
+```
+The `server` make target is all that is required to build iRODS core, but plugins require other externals. See [https://github.com/irods/externals](https://github.com/irods/externals) for more information.
+
+The `--git-repository` option allows for one of two options:
+  1. A URL to a git repository which can be cloned into the container.
+  2. A path to a directory inside the container which mounts an existing repository on the host machine.
+
+Option 2 is useful for those who would like to keep a build cache on the host machine. Here is what that usage would look like:
+```bash
+docker run --rm \
+           -v /full/path/to/externals/packages/output/directory:/irods_externals_packages \
+           -v /full/path/to/externals/repository:/externals-mount \
+           irods-externals-builder-m:<platform> --git-repository /externals-mount
+```
+The name of the mountpoint does not need to be "externals-mount". All that matters is that the name of the mountpoint is the same as what is used for the value of the `--git-repository` option.
