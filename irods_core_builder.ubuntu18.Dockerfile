@@ -17,12 +17,11 @@ RUN \
     python-psutil \
     python-requests \
     python-jsonschema \
-    python-distro \
     python3 \
-    python3-psutil \
-    python3-requests \
-    python3-jsonschema \
     python3-distro \
+    python3-psutil \
+    python3-jsonschema \
+    python3-requests \
     libssl-dev \
     super \
     lsof \

@@ -104,11 +104,11 @@ if [ -n "$dry_run" ]; then  # -- print mount options for the debugger run
 else
     build_dir=$(dirname "$0")
     cd "$build_dir" || { echo >&2 "cannot cd to docker build environment"; exit 2; }
-    docker build --build-arg debugger_base=${base_image}  -f Dockerfile.build_debuggers."$OS_NAME" -t debuggers."$OS_NAME" . ${NO_CACHE}
+    docker build --build-arg debugger_base=${base_image}  -f build_debuggers."$OS_NAME".Dockerfile -t debuggers."$OS_NAME" . ${NO_CACHE}
     if [ -n "$do_source_build" ]; then
-        docker build -t irods_core_builder."$OS_NAME" -f Dockerfile.irods_core_builder."$OS_NAME" . ${NO_CACHE}
+        docker build -t irods_core_builder."$OS_NAME" -f irods_core_builder."$OS_NAME".Dockerfile . ${NO_CACHE}
         docker run "${vol_mounts[@]}" irods_core_builder."$OS_NAME" ${do_source_build:1} ${BUILD_OPTIONS}
     fi
-    docker build --build-arg runner_base=debuggers."$OS_NAME" -t "${IMAGE}" -f Dockerfile.irods_runner."$OS_NAME" . ${NO_CACHE}
+    docker build --build-arg runner_base=debuggers."$OS_NAME" -t "${IMAGE}" -f irods_runner."$OS_NAME".Dockerfile . ${NO_CACHE}
     docker run "${vol_mounts[@]}" ${DOCKER_OPTIONS} ${DEBUG_OPTIONS} "${IMAGE}"
 fi
