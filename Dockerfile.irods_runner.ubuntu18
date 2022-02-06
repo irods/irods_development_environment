@@ -17,9 +17,15 @@ RUN \
     rsyslog \
     python \
     python-psutil \
-    python3-psutil \
     python-requests \
     python-jsonschema \
+    python-distro \
+    python3 \
+    python3-psutil \
+    python3-requests \
+    python3-jsonschema \
+    python3-pyodbc \
+    python3-distro \
     libssl-dev \
     super \
     lsof \
