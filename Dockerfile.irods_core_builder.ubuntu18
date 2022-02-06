@@ -17,6 +17,12 @@ RUN \
     python-psutil \
     python-requests \
     python-jsonschema \
+    python-distro \
+    python3 \
+    python3-psutil \
+    python3-requests \
+    python3-jsonschema \
+    python3-distro \
     libssl-dev \
     super \
     lsof \
@@ -72,7 +78,7 @@ RUN \
 #
 FROM irods_package_builder_base as irods_package_builder
 
-ARG cmake_path="/opt/irods-externals/cmake3.11.4-0/bin"
+ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH ${cmake_path}:$PATH
 
 ARG clang_path="/opt/irods-externals/clang6.0-0/bin"

@@ -22,16 +22,29 @@ RUN \
     python2-psutil \
     python-requests \
     python2-jsonschema \
+    python36 \
+    python36-psutil \
+    python36-requests \
     openssl \
     openssl-devel \
     super \
     lsof \
     postgresql-server \
     unixODBC-devel \
+    pyodbc \
     libjson-perl \
   && \
   yum clean all && \
   rm -rf /var/cache/yum /tmp/*
+
+# For Python3 modules not available as packages in Centos 7:
+RUN yum install -y \
+        gcc-c++ \
+        make \
+        python3-devel # pyodbc requires building
+RUN python3 -m pip install pyodbc \
+      distro \
+      jsonschema
 
 RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     wget -qO - https://packages.irods.org/renci-irods.yum.repo | sudo tee /etc/yum.repos.d/renci-irods.yum.repo && \

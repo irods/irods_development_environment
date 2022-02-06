@@ -21,7 +21,11 @@ RUN \
     python \
     python2-psutil \
     python-requests \
+    python-distro \
     python2-jsonschema \
+    python36 \
+    python36-psutil \
+    python36-requests \
     openssl \
     openssl-devel \
     super \
@@ -32,6 +36,15 @@ RUN \
   && \
   yum clean all && \
   rm -rf /var/cache/yum /tmp/*
+
+# For Python3 modules not available as packages in Centos 7:
+RUN yum install -y \
+        gcc-c++ \
+        make \
+        python3-devel # pyodbc requires building
+RUN python3 -m pip install pyodbc
+RUN python3 -m pip install distro
+RUN python3 -m pip install jsonschema
 
 RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     wget -qO - https://packages.irods.org/renci-irods.yum.repo | sudo tee /etc/yum.repos.d/renci-irods.yum.repo && \
@@ -82,7 +95,7 @@ RUN \
 #
 FROM irods_package_builder_base as irods_package_builder
 
-ARG cmake_path="/opt/irods-externals/cmake3.11.4-0/bin"
+ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH ${cmake_path}:$PATH
 
 ARG clang_path="/opt/irods-externals/clang6.0-0/bin"
