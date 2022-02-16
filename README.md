@@ -41,6 +41,8 @@ $ cd /full/path/to/irods_development_environment_repository_clone
 $ docker build -f irods_core_builder.centos7.Dockerfile -t irods-core-builder-centos7 .
 $ docker build -f irods_core_builder.ubuntu16.Dockerfile -t irods-core-builder-ubuntu16 .
 $ docker build -f irods_core_builder.ubuntu18.Dockerfile -t irods-core-builder-ubuntu18 .
+$ docker build -f irods_core_builder.ubuntu20.Dockerfile -t irods-core-builder-m:ubuntu-20.04 .
+$ docker build -f irods_core_builder.debian11.Dockerfile -t irods-core-builder-m:debian-11 .
 $ docker build -f irods_runner.centos7.Dockerfile -t irods-runner-centos7 .
 $ docker build -f irods_runner.ubuntu16.Dockerfile -t irods-runner-ubuntu16 .
 $ docker build -f irods_runner.ubuntu18.Dockerfile -t irods-runner-ubuntu18 .
