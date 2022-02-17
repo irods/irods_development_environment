@@ -2,19 +2,19 @@
 
 usage() {
 cat <<_EOF_
-Usage: ./build_image.sh [OPTIONS]...
+Usage: ./build_core_builder_image.sh [OPTIONS]...
 
-Builds a new docker image.
+Builds an iRODS core builder image.
 
 Example:
 
-    ./build_image.sh --image-name <arg> ...
+    ./build_core_builder_image.sh --image-name <arg> ...
 
 Available options:
 
-    --image-name            The name of the new docker image
+    --image-tag             Desired tag for the new docker image
     --cmake-path            Full path to the CMake binary (e.g. /opt/irods-externals/cmakeX.X.X/bin)
-    --dockerfile            Dockerfile to build (default: ./Dockerfile)
+    --dockerfile            Dockerfile to build (required)
     --no-cache              Do not use cached images when building
     -h, --help              This message
 _EOF_
@@ -25,7 +25,7 @@ _EOF_
 image_name=irods-core-builder
 build_args=
 docker_build_args=
-dockerfile=Dockerfile.ub16
+dockerfile=
 
 while [ -n "$1" ]; do
     case "$1" in
