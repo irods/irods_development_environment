@@ -36,6 +36,8 @@ elif [ "${package_manager}" == "apt" ] ; then
     install_command="apt install -fy --allow-downgrades"
 elif [ "${package_manager}" == "yum" ] ; then
     install_command="yum install -y"
+elif [ "${package_manager}" == "dnf" ] ; then
+    install_command="dnf install -y"
 fi
 
 if [[ -z ${install_command} ]] ; then
