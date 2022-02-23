@@ -84,12 +84,13 @@ RUN \
   rm -rf /var/cache/yum /tmp/*
 
 ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
-ENV PATH ${cmake_path}:$PATH
+ENV PATH=${cmake_path}:$PATH
 
 ARG clang_path="/opt/irods-externals/clang6.0-0/bin"
-ENV PATH ${clang_path}:$PATH
+ENV PATH=${clang_path}:$PATH
 
-ENV file_extension "rpm"
+ENV file_extension="rpm"
+ENV package_manager="yum"
 
 COPY build_and_copy_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_packages_to_dir.sh

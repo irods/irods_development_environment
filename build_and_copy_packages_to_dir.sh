@@ -19,16 +19,23 @@ _EOF_
     exit
 }
 
+if [[ -z ${package_manager} ]] ; then
+    echo "\$package_manager not defined"
+    exit 1
+fi
+
 if [[ -z ${file_extension} ]] ; then
     echo "\$file_extension not defined"
     exit 1
 fi
 
 install_command=""
-if [ "${file_extension}" == "rpm" ] ; then
-    install_command="yum install -y"
-elif [ "${file_extension}" == "deb" ] ; then
+if [ "${package_manager}" == "apt-get" ] ; then
+    install_command="apt-get install -fy --allow-downgrades"
+elif [ "${package_manager}" == "apt" ] ; then
     install_command="apt install -fy --allow-downgrades"
+elif [ "${package_manager}" == "yum" ] ; then
+    install_command="yum install -y"
 fi
 
 if [[ -z ${install_command} ]] ; then

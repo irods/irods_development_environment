@@ -27,6 +27,7 @@ RUN \
   hash -r
 
 ENV file_extension="deb"
+ENV package_manager="apt"
 
 WORKDIR /
 COPY build_and_copy_externals_to_dir.sh /

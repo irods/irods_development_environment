@@ -40,6 +40,7 @@ RUN \
 ENV PATH=/opt/rh/devtoolset-10/root/usr/bin:$PATH
 
 ENV file_extension="rpm"
+ENV package_manager="yum"
 
 WORKDIR /
 COPY build_and_copy_externals_to_dir.sh /
