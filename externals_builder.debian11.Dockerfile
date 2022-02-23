@@ -22,6 +22,7 @@ RUN \
   rm -rf /externals
 
 ENV file_extension="deb"
+ENV package_manager="apt"
 
 WORKDIR /
 COPY build_and_copy_externals_to_dir.sh /
