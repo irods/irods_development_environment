@@ -101,7 +101,9 @@ RUN git clone http://github.com/mozilla/rr && \
         -DCMAKE_INSTALL_PREFIX:PATH="${tools_prefix}" \
         ../rr \
     && \
-    /opt/irods-externals/cmake3.11.4-0/bin/cmake --build . --target install -- -j${parallelism}
+    /opt/irods-externals/cmake3.11.4-0/bin/cmake --build . --target install -- -j${parallelism} && \
+    cd .. && \
+    rm -rf obj rr
 
 #--------
 # gdb

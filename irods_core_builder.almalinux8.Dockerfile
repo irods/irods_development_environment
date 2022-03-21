@@ -28,14 +28,20 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
+# For Python3 modules not available as packages:
 # python3-devel must be installed because pyodbc requires building
 RUN dnf install -y \
         gcc-c++ \
         make \
-        python3-devel
-
-# For Python3 modules not available as packages:
-RUN python3 -m pip install pyodbc distro jsonschema
+        python3-devel \
+    && \
+    python3 -m pip --no-cache-dir install \
+        pyodbc \
+        distro \
+        jsonschema \
+    && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 # TODO: when externals packages are published for almalinux:8, this section can be uncommented
 #RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \

@@ -26,7 +26,9 @@ ARG externals_branch="main"
 WORKDIR /externals
 RUN git clone https://github.com/irods/externals -b "${externals_branch}" /externals && \
     ./install_prerequisites.py && \
-    rm -rf /externals
+    rm -rf /externals && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN update-alternatives --install /usr/local/bin/gcc gcc /usr/bin/gcc-10 1 && \
     update-alternatives --install /usr/local/bin/g++ g++ /usr/bin/g++-10 1 && \

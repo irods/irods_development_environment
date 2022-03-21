@@ -34,14 +34,20 @@ RUN yum install -y \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-# For Python3 modules not available as packages in Centos 7:
+# For Python3 modules not available as packages:
+# python3-devel must be installed because pyodbc requires building
 RUN yum install -y \
         gcc-c++ \
         make \
-        python3-devel # pyodbc requires building
-RUN python3 -m pip install pyodbc
-RUN python3 -m pip install distro
-RUN python3 -m pip install jsonschema
+        python3-devel \
+    && \
+    python3 -m pip --no-cache-dir install \
+        pyodbc \
+        distro \
+        jsonschema \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
 
 RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     wget -qO - https://packages.irods.org/renci-irods.yum.repo | tee /etc/yum.repos.d/renci-irods.yum.repo && \

@@ -21,13 +21,13 @@ RUN yum install -y \
     rm -rf /var/cache/yum /tmp/*
 
 RUN yum install -y python-pip && \
-    pip install --upgrade 'pip<21.0' \
+    pip --no-cache-dir install --upgrade 'pip<21.0' \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
 RUN git clone https://github.com/irods/irods_python_ci_utilities && \
-    pip install -e /irods_python_ci_utilities
+    pip --no-cache-dir install -e /irods_python_ci_utilities
 
 COPY build_and_copy_plugin_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_plugin_packages_to_dir.sh
