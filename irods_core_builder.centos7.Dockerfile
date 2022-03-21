@@ -2,36 +2,34 @@ FROM centos:7
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
-RUN \
-  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-  yum install -y \
-    epel-release \
-    wget \
-  && \
-  yum clean all && \
-  rm -rf /var/cache/yum /tmp/*
+RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
+    yum install -y \
+        epel-release \
+        wget \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
 
-RUN \
-  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-  yum install -y \
-    python \
-    python2-psutil \
-    python-requests \
-    python-distro \
-    python2-jsonschema \
-    python36 \
-    python36-psutil \
-    python36-requests \
-    openssl \
-    openssl-devel \
-    super \
-    lsof \
-    postgresql-server \
-    unixODBC-devel \
-    libjson-perl \
-  && \
-  yum clean all && \
-  rm -rf /var/cache/yum /tmp/*
+RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
+    yum install -y \
+        python \
+        python2-psutil \
+        python-requests \
+        python-distro \
+        python2-jsonschema \
+        python36 \
+        python36-psutil \
+        python36-requests \
+        openssl \
+        openssl-devel \
+        super \
+        lsof \
+        postgresql-server \
+        unixODBC-devel \
+        libjson-perl \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
 
 # For Python3 modules not available as packages in Centos 7:
 RUN yum install -y \
@@ -50,38 +48,36 @@ RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN \
-  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-  yum install -y \
-    'irods-externals*' \
-  && \
-  yum clean all && \
-  rm -rf /var/cache/yum /tmp/*
+RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
+    yum install -y \
+        'irods-externals*' \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
 
 # NOTE: This step cannot be combined with the installation step(s) above. Certain packages will
 # not be installed until certain other packages are installed. It's very sad and confusing.
-RUN \
-  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-  yum install -y \
-    git \
-    ninja-build \
-    pam-devel \
-    krb5-devel \
-    fuse-devel \
-    which \
-    libcurl-devel \
-    bzip2-devel \
-    libxml2-devel \
-    zlib-devel \
-    python-devel \
-    make \
-    gcc-c++ \
-    help2man \
-    rpm-build \
-    sudo \
-  && \
-  yum clean all && \
-  rm -rf /var/cache/yum /tmp/*
+RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
+    yum install -y \
+        git \
+        ninja-build \
+        pam-devel \
+        krb5-devel \
+        fuse-devel \
+        which \
+        libcurl-devel \
+        bzip2-devel \
+        libxml2-devel \
+        zlib-devel \
+        python-devel \
+        make \
+        gcc-c++ \
+        help2man \
+        rpm-build \
+        sudo \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
 
 ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH=${cmake_path}:$PATH

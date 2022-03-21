@@ -13,53 +13,50 @@ WORKDIR /tmp
 #--------
 # gdb
 
-RUN \
-  apt-get update && \
-  apt-get install -y \
-    texinfo \
-    libncurses5-dev \
-    g++ \
-    wget \
-    make \
-    python-dev \
-  && \
-  apt-get remove -y python3-dev && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/*
+RUN apt-get update && \
+    apt-get install -y \
+        texinfo \
+        libncurses5-dev \
+        g++ \
+        wget \
+        make \
+        python-dev \
+    && \
+    apt-get remove -y python3-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN \
-  wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz \
-    && tar xzf gdb*.tar.gz \
-    && cd gdb*/ \
-    && ./configure --prefix=${tools_prefix} --with-python --with-curses --enable-tui \
-    && make -j${parallelism} \
-    && make install \
-    && cd .. \
-    && rm -rf gdb*.tar.gz gdb*/
+RUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz && \
+    tar xzf gdb*.tar.gz && \
+    cd gdb*/ && \
+    ./configure --prefix=${tools_prefix} --with-python --with-curses --enable-tui && \
+    make -j${parallelism} && \
+    make install && \
+    cd .. && \
+    rm -rf gdb*.tar.gz gdb*/
 
 #--------
 # rr
 
 ARG rr_commit="4513b23c8092097dc42c73f3cbaf4cfaebd04efe"
 
-RUN \
-  apt-get update && \
-  apt-get install -y \
-    ccache \
-    cmake \
-    g++-multilib \
-    gdb \
-    pkg-config \
-    coreutils \
-    python3-pexpect \
-    manpages-dev \
-    git \
-    ninja-build \
-    capnproto \
-    libcapnp-dev \
-  && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/*
+RUN apt-get update && \
+    apt-get install -y \
+        ccache \
+        cmake \
+        g++-multilib \
+        gdb \
+        pkg-config \
+        coreutils \
+        python3-pexpect \
+        manpages-dev \
+        git \
+        ninja-build \
+        capnproto \
+        libcapnp-dev \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN git clone http://github.com/mozilla/rr && \
     cd rr && \
@@ -87,13 +84,12 @@ RUN wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2 && \
 #--------
 # utils
 
-RUN \
-  apt-get update && \
-  apt-get install -y \
-    tmux \
-    vim \
-    nano \
-    tig \
-  && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/*
+RUN apt-get update && \
+    apt-get install -y \
+        tmux \
+        vim \
+        nano \
+        tig \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
