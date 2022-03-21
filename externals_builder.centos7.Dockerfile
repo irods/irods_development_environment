@@ -26,9 +26,11 @@ WORKDIR /externals
 RUN git clone https://github.com/irods/externals -b "${externals_branch}" /externals && \
     python3 -m venv build_env && \
     source build_env/bin/activate && \
-    python3 -m pip install distro && \
+    python3 -m pip --no-cache-dir install distro && \
     ./install_prerequisites.py && \
-    rm -rf /externals
+    rm -rf /externals && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
 
 # TODO: The following will enable the newer toolchain on interactive shell logins. The
 # externals builder, however, is not an interactive shell, so this does not execute. This seems

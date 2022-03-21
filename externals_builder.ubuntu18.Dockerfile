@@ -27,7 +27,9 @@ ARG externals_branch="main"
 WORKDIR /externals
 RUN git clone https://github.com/irods/externals -b "${externals_branch}" /externals && \
     ./install_prerequisites.py && \
-    rm -rf /externals
+    rm -rf /externals && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
 
 ENV file_extension="deb"
 ENV package_manager="apt"

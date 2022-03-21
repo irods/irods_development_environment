@@ -38,6 +38,7 @@ RUN apt-get update && \
 RUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz && \
     tar xzf gdb*.tar.gz && \
     cd gdb*/ && \
+    export CCACHE_DISABLE=1 && \
     ./configure --prefix=${tools_prefix} --with-python --with-curses --enable-tui && \
     make -j${parallelism} && \
     make install && \

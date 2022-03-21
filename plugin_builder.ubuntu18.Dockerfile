@@ -29,7 +29,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN git clone https://github.com/irods/irods_python_ci_utilities && \
-    pip install -e /irods_python_ci_utilities
+    pip --no-cache-dir install -e /irods_python_ci_utilities
 
 ENV file_extension="deb"
 ENV package_manager="apt"
