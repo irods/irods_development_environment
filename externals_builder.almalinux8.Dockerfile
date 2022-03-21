@@ -2,8 +2,12 @@ FROM almalinux:8
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
-RUN dnf update -y && \
-    dnf install -y \
+# Make sure we're starting with an up-to-date image
+RUN dnf update -y || [ "$?" -eq 100 ] && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf /tmp/*
+
+RUN dnf install -y \
         sudo \
         git \
         python3 \

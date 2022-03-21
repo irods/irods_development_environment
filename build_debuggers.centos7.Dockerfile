@@ -3,6 +3,11 @@ FROM ${debugger_base}
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
+# Make sure we're starting with an up-to-date image
+RUN yum update -y || [ "$?" -eq 100 ] && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
 ARG parallelism=3
 ARG tools_prefix=/opt/debug_tools
 
@@ -13,8 +18,7 @@ WORKDIR /tmp
 #--------
 # TODO: Figure out what section these go in
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         epel-release \
         sudo \
         wget \
@@ -23,8 +27,7 @@ RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && 
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         python3 \
         ccache \
         cmake \
@@ -45,8 +48,7 @@ RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && 
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         python3-pip \
     && \
     yum clean all && \
@@ -59,8 +61,7 @@ RUN pip3 --no-cache-dir install pexpect
 
 ARG rr_commit="4513b23c8092097dc42c73f3cbaf4cfaebd04efe"
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         capnproto \
         capnproto-devel \
         capnproto-libs \
@@ -77,8 +78,7 @@ RUN rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         irods-externals-clang-runtime6.0-0 \
         irods-externals-clang6.0-0 \
         irods-externals-cmake3.11.4-0 \
@@ -106,8 +106,7 @@ RUN git clone http://github.com/mozilla/rr && \
 #--------
 # gdb
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         texinfo \
     && \
     yum clean all && \
@@ -126,8 +125,7 @@ RUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz && \
 #--------
 # valgrind
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         bzip2 \
     && \
     yum clean all && \
@@ -145,8 +143,7 @@ RUN wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2 && \
 #--------
 # utils
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         nano \
         vim-enhanced \
         tmux \

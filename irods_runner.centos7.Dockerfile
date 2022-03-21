@@ -4,8 +4,12 @@
 ARG runner_base=centos:7
 FROM ${runner_base} as irods-runner
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+# Make sure we're starting with an up-to-date image
+RUN yum update -y || [ "$?" -eq 100 ] && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
+RUN yum install -y \
         epel-release \
         sudo \
         wget \
@@ -13,8 +17,7 @@ RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && 
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         rsyslog \
         python \
         python2-psutil \
@@ -52,8 +55,7 @@ RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         'irods-externals*' \
         irods-runtime-4.2.0-1.x86_64 \
         irods-icommands-4.2.0-1.x86_64 \

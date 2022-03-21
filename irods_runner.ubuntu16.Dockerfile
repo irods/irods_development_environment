@@ -6,6 +6,15 @@ FROM ${runner_base} as irods-runner
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Make sure we're starting with an up-to-date image
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get autoremove -y --purge && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
+# To mark all installed packages as manually installed:
+#apt-mark showauto | xargs -r apt-mark manual
+
 RUN apt-get update && \
     apt-get install -y \
         apt-transport-https \

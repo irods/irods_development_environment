@@ -2,8 +2,12 @@ FROM centos:7
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+# Make sure we're starting with an up-to-date image
+RUN yum update -y || [ "$?" -eq 100 ] && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
+RUN yum install -y \
         sudo \
         git \
         python3 \
