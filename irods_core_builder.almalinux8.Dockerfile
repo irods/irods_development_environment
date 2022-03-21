@@ -5,14 +5,14 @@ SHELL [ "/usr/bin/bash", "-c" ]
 # Make sure we're starting with an up-to-date image
 RUN dnf update -y || [ "$?" -eq 100 ] && \
     dnf clean all && \
-    rm -rf /var/cache/dnf /tmp/*
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 RUN dnf install -y \
         epel-release \
         wget \
     && \
     dnf clean all && \
-    rm -rf /var/cache/dnf /tmp/*
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 RUN dnf install -y \
         python3 \
@@ -26,7 +26,7 @@ RUN dnf install -y \
         which \
     && \
     dnf clean all && \
-    rm -rf /var/cache/dnf /tmp/*
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 # python3-devel must be installed because pyodbc requires building
 RUN dnf install -y \
@@ -76,7 +76,7 @@ RUN dnf install -y \
         help2man \
     && \
     dnf clean all && \
-    rm -rf /var/cache/dnf /tmp/*
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH=${cmake_path}:$PATH

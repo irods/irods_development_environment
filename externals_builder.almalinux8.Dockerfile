@@ -5,7 +5,7 @@ SHELL [ "/usr/bin/bash", "-c" ]
 # Make sure we're starting with an up-to-date image
 RUN dnf update -y || [ "$?" -eq 100 ] && \
     dnf clean all && \
-    rm -rf /var/cache/dnf /tmp/*
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 RUN dnf install -y \
         sudo \
@@ -16,7 +16,7 @@ RUN dnf install -y \
         gcc-toolset-11 \
     && \
     dnf clean all && \
-    rm -rf /var/cache/dnf /tmp/*
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 ARG externals_branch="main"
 
