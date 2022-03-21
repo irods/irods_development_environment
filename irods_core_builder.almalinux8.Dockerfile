@@ -2,16 +2,19 @@ FROM almalinux:8
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
-RUN dnf update -y && \
-    dnf install -y \
+# Make sure we're starting with an up-to-date image
+RUN dnf update -y || [ "$?" -eq 100 ] && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf /tmp/*
+
+RUN dnf install -y \
         epel-release \
         wget \
     && \
     dnf clean all && \
     rm -rf /var/cache/dnf /tmp/*
 
-RUN dnf update -y && \
-    dnf install -y \
+RUN dnf install -y \
         python3 \
         python3-psutil \
         python3-requests \
@@ -43,8 +46,7 @@ RUN python3 -m pip install pyodbc distro jsonschema
 #    yum clean all && \
 #    rm -rf /var/cache/yum /tmp/*
 
-#RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-#    yum install -y \
+#RUN yum install -y \
 #        'irods-externals*' \
 #    && \
 #    yum clean all && \
@@ -55,14 +57,12 @@ RUN python3 -m pip install pyodbc distro jsonschema
 #
 # For almalinux:8, the powertools repository should be enabled so that certain developer
 # tools such as ninja-build and help2man can be installed.
-RUN dnf update -y && \
-    dnf install -y \
+RUN dnf install -y \
         dnf-plugins-core \
     && \
     dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     dnf config-manager --set-enabled powertools \
     && \
-    dnf update -y && \
     dnf install -y \
         git \
         pam-devel \

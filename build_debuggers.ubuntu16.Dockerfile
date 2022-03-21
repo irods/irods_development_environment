@@ -1,6 +1,15 @@
 ARG  debugger_base
 FROM ${debugger_base}
 
+# Make sure we're starting with an up-to-date image
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get autoremove -y --purge && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
+# To mark all installed packages as manually installed:
+#apt-mark showauto | xargs -r apt-mark manual
+
 ARG parallelism=3
 ARG tools_prefix=/opt/debug_tools
 

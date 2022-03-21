@@ -2,16 +2,19 @@ FROM centos:7
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+# Make sure we're starting with an up-to-date image
+RUN yum update -y || [ "$?" -eq 100 ] && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
+RUN yum install -y \
         epel-release \
         wget \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         python \
         python2-psutil \
         python-requests \
@@ -48,8 +51,7 @@ RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         'irods-externals*' \
     && \
     yum clean all && \
@@ -57,8 +59,7 @@ RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && 
 
 # NOTE: This step cannot be combined with the installation step(s) above. Certain packages will
 # not be installed until certain other packages are installed. It's very sad and confusing.
-RUN yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-    yum install -y \
+RUN yum install -y \
         git \
         ninja-build \
         pam-devel \
