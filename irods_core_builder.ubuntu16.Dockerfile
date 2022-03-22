@@ -36,12 +36,14 @@ RUN apt-get update && \
         python-jsonschema \
         python-psutil \
         python-requests \
+        python3-pip \
         sudo \
         super \
         unixodbc-dev \
         wget \
         zlib1g-dev \
     && \
+    pip3 --no-cache-dir install lief==0.10.1 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 

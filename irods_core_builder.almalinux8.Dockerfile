@@ -34,11 +34,14 @@ RUN dnf install -y \
         gcc-c++ \
         make \
         python3-devel \
+        python3-pip \
+        python3-packaging \
     && \
     python3 -m pip --no-cache-dir install \
         pyodbc \
         distro \
         jsonschema \
+        lief \
     && \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
