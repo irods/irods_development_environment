@@ -1,6 +1,8 @@
 ARG  debugger_base
 FROM ${debugger_base}
 
+SHELL [ "/bin/bash", "-c" ]
+
 # Make sure we're starting with an up-to-date image
 RUN apt-get update && \
     apt-get upgrade -y && \

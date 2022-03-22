@@ -4,6 +4,8 @@
 ARG runner_base=ubuntu:16.04
 FROM ${runner_base} as irods-runner
 
+SHELL [ "/bin/bash", "-c" ]
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Make sure we're starting with an up-to-date image
