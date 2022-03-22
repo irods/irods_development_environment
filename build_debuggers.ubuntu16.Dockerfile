@@ -3,6 +3,8 @@ FROM ${debugger_base}
 
 SHELL [ "/bin/bash", "-c" ]
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Make sure we're starting with an up-to-date image
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -14,8 +16,6 @@ RUN apt-get update && \
 
 ARG parallelism=3
 ARG tools_prefix=/opt/debug_tools
-
-ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p  ${tools_prefix}
 
