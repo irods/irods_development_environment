@@ -1,8 +1,7 @@
 #! /bin/bash -ex
 
-
 # Build iRODS
-python /irods_plugin_source/irods_consortium_continuous_integration_build_hook.py \
+${python} /irods_plugin_source/irods_consortium_continuous_integration_build_hook.py \
     --irods_packages_root_directory /irods_packages $@
 
 # Copy packages to mounts

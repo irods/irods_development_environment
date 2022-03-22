@@ -23,7 +23,8 @@ RUN \
 
 RUN \
   git clone https://github.com/irods/irods_python_ci_utilities && \
-  pip install -e /irods_python_ci_utilities
+  pip install /irods_python_ci_utilities && \
+  rm -r /irods_python_ci_utilities
 
 COPY build_and_copy_plugin_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_plugin_packages_to_dir.sh
