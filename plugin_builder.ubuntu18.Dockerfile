@@ -34,7 +34,7 @@ RUN git clone https://github.com/irods/irods_python_ci_utilities && \
     pip --no-cache-dir install -e /irods_python_ci_utilities
 
 ENV file_extension="deb"
-ENV package_manager="apt"
+ENV package_manager="apt-get"
 
 COPY build_and_copy_plugin_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_plugin_packages_to_dir.sh

@@ -13,8 +13,8 @@ RUN apt-get update && \
 # To mark all installed packages as manually installed:
 #apt-mark showauto | xargs -r apt-mark manual
 
-RUN apt update && \
-    apt install -y \
+RUN apt-get update && \
+    apt-get install -y \
         sudo \
         git \
         python \

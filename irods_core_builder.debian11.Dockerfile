@@ -74,7 +74,7 @@ ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH ${cmake_path}:$PATH
 
 ENV file_extension "deb"
-ENV package_manager "apt"
+ENV package_manager "apt-get"
 
 COPY build_and_copy_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_packages_to_dir.sh
