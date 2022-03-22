@@ -4,6 +4,8 @@
 ARG runner_base=centos:7
 FROM ${runner_base} as irods-runner
 
+SHELL [ "/bin/bash", "-c" ]
+
 # Make sure we're starting with an up-to-date image
 RUN yum update -y || [ "$?" -eq 100 ] && \
     yum clean all && \

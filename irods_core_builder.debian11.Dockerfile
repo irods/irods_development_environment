@@ -1,5 +1,7 @@
 FROM debian:11
 
+SHELL [ "/bin/bash", "-c" ]
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Make sure we're starting with an up-to-date image
