@@ -63,12 +63,13 @@ RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
+ARG irods_version="4.2.0"
 RUN yum install -y \
         'irods-externals*' \
-        irods-runtime-4.2.0-1.x86_64 \
-        irods-icommands-4.2.0-1.x86_64 \
-        irods-server-4.2.0-1.x86_64 \
-        irods-database-plugin-postgres-4.2.0-1.x86_64 \
+        irods-runtime-${irods_version} \
+        irods-icommands-${irods_version} \
+        irods-server-${irods_version} \
+        irods-database-plugin-postgres-${irods_version} \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
