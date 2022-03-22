@@ -74,7 +74,7 @@ ARG clang_path="/opt/irods-externals/clang6.0-0/bin"
 ENV PATH=${clang_path}:$PATH
 
 ENV file_extension="deb"
-ENV package_manager="apt"
+ENV package_manager="apt-get"
 
 COPY build_and_copy_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_packages_to_dir.sh

@@ -13,8 +13,8 @@ RUN apt-get update && \
 # To mark all installed packages as manually installed:
 #apt-mark showauto | xargs -r apt-mark manual
 
-RUN apt update && \
-    apt install -y \
+RUN apt-get update && \
+    apt-get install -y \
         sudo \
         git \
         python3 \
@@ -37,7 +37,7 @@ RUN update-alternatives --install /usr/local/bin/gcc gcc /usr/bin/gcc-10 1 && \
     hash -r
 
 ENV file_extension="deb"
-ENV package_manager="apt"
+ENV package_manager="apt-get"
 
 WORKDIR /
 COPY build_and_copy_externals_to_dir.sh /

@@ -29,21 +29,38 @@ if [[ -z ${file_extension} ]] ; then
     exit 1
 fi
 
-install_command=""
-if [ "${package_manager}" == "apt-get" ] ; then
-    install_command="apt-get install -fy --allow-downgrades"
-elif [ "${package_manager}" == "apt" ] ; then
-    install_command="apt install -fy --allow-downgrades"
-elif [ "${package_manager}" == "yum" ] ; then
-    install_command="yum install -y"
-elif [ "${package_manager}" == "dnf" ] ; then
-    install_command="dnf install -y"
-fi
+supported_package_manager_frontends=(
+    "apt-get"
+    "yum"
+    "dnf"
+)
 
-if [[ -z ${install_command} ]] ; then
-    echo "platform unsupported"
+if [[ ! " ${supported_package_manager_frontends[*]} " =~ " ${package_manager} " ]]; then
+    echo "unsupported platform or package manager"
     exit 1
 fi
+
+install_packages() {
+    if [ "${package_manager}" == "apt-get" ] ; then
+        dpkg -i "$@" || true
+        apt-get install -fy --allow-downgrades
+        for pkg_file in "$@" ; do
+            pkg_name="$(dpkg-deb --field "${pkg_file}" Package)"
+            pkg_arch="$(dpkg-deb --field "${pkg_file}" Architecture)"
+            pkg_vers="$(dpkg-deb --field "${pkg_file}" Version)"
+
+            pkg_vers_inst="$(dpkg-query  --showformat='${Version}' --show "${pkg_name}:${pkg_arch}")" ||
+                (echo "could not verify installation of ${pkg_file}" && exit 1)
+            if [ "${pkg_vers}" == "${pkg_vers_inst}" ] ; then
+                echo "installed version of ${pkg_name}:${pkg_arch} does not match ${pkg_file}"
+            fi
+        done
+    elif [ "${package_manager}" == "yum" ] ; then
+        yum install -y "$@"
+    elif [ "${package_manager}" == "dnf" ] ; then
+        dnf install -y "$@"
+    fi
+}
 
 core_only=0
 make_program="make"
@@ -68,7 +85,7 @@ while [ -n "$1" ] ; do
 done
 
 if [[ ! -z ${custom_externals} ]] ; then
-    ${install_command} "${custom_externals}"/irods-externals-*."${file_extension}"
+    install_packages "${custom_externals}"/irods-externals-*."${file_extension}"
 fi
 
 build_jobs=$(( !build_jobs ? $(nproc) - 1 : build_jobs )) #prevent maxing out CPUs
@@ -100,7 +117,7 @@ echo "beginning build of iCommands"
 echo "========================================="
 
 # Install packages for building iCommands
-${install_command} /irods_packages/irods-{runtime,dev}*."${file_extension}"
+install_packages /irods_packages/irods-{runtime,dev}*."${file_extension}"
 
 # Build iCommands
 mkdir -p /icommands_build && cd /icommands_build
