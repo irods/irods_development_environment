@@ -14,33 +14,60 @@ RUN \
 RUN \
   yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
-    python \
-    python2-psutil \
-    python-requests \
-    python-distro \
-    python2-jsonschema \
-    python36 \
-    python36-psutil \
-    python36-requests \
+    bzip2-devel \
+    fuse-devel \
+    gcc-c++ \
+    git \
+    help2man \
+    krb5-devel \
+    libcurl-devel \
+    libjson-perl \
+    libxml2-devel \
+    lsof \
+    make \
+    ninja-build \
     openssl \
     openssl-devel \
-    super \
-    lsof \
+    pam-devel \
     postgresql-server \
+    python \
+    rpm-build \
+    sudo \
+    super \
     unixODBC-devel \
-    libjson-perl \
+    which \
+    zlib-devel \
   && \
   yum clean all && \
   rm -rf /var/cache/yum /tmp/*
 
-# For Python3 modules not available as packages in Centos 7:
-RUN yum install -y \
-        gcc-c++ \
-        make \
-        python3-devel # pyodbc requires building
-RUN python3 -m pip install pyodbc
-RUN python3 -m pip install distro
-RUN python3 -m pip install jsonschema
+# python 2 and 3 must be installed separately because yum will ignore/discard python2
+RUN \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
+  yum install -y \
+    python3 \
+    python3-devel \
+    python3-pip \
+  yum clean all && \
+  rm -rf /var/cache/yum /tmp/*
+
+RUN \
+  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
+  yum install -y \
+    python \
+    python-devel \
+    python-distro \
+    python-pip \
+    python-requests \
+    python-jsonschema \
+    python-psutil \
+  yum clean all && \
+  rm -rf /var/cache/yum /tmp/*
+
+ARG python_version="python3"
+ENV python=${python_version}
+
+RUN ${python} -m pip install pyodbc distro jsonschema
 
 RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     wget -qO - https://packages.irods.org/renci-irods.yum.repo | tee /etc/yum.repos.d/renci-irods.yum.repo && \
@@ -54,31 +81,6 @@ RUN \
   yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
   yum install -y \
     'irods-externals*' \
-  && \
-  yum clean all && \
-  rm -rf /var/cache/yum /tmp/*
-
-# NOTE: This step cannot be combined with the installation step(s) above. Certain packages will
-# not be installed until certain other packages are installed. It's very sad and confusing.
-RUN \
-  yum check-update -q >/dev/null || { [ "$?" -eq 100 ] && yum update -y; } && \
-  yum install -y \
-    git \
-    ninja-build \
-    pam-devel \
-    krb5-devel \
-    fuse-devel \
-    which \
-    libcurl-devel \
-    bzip2-devel \
-    libxml2-devel \
-    zlib-devel \
-    python-devel \
-    make \
-    gcc-c++ \
-    help2man \
-    rpm-build \
-    sudo \
   && \
   yum clean all && \
   rm -rf /var/cache/yum /tmp/*

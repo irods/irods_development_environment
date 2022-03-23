@@ -14,27 +14,42 @@ RUN \
 RUN \
   dnf update -y && \
   dnf install -y \
-    python3 \
-    python3-psutil \
-    python3-requests \
+    dnf-plugins-core \
+  && \
+  dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
+  dnf config-manager --set-enabled powertools && \
+  dnf update -y && \
+  dnf install -y \
+    bzip2-devel \
+    fuse-devel \
+    gcc-c++ \
+    make \
+    git \
+    help2man \
+    libcurl-devel \
+    libxml2-devel \
+    lsof \
+    ninja-build \
     openssl \
     openssl-devel \
-    lsof \
+    pam-devel \
     postgresql-server \
+    python3 \
+    python3-devel \
+    python3-psutil \
+    python3-requests \
+    rpm-build \
+    sudo \
     unixODBC-devel \
     which \
   && \
   dnf clean all && \
   rm -rf /var/cache/dnf /tmp/*
 
-# python3-devel must be installed because pyodbc requires building
-RUN dnf install -y \
-        gcc-c++ \
-        make \
-        python3-devel
+ARG python_version="python3"
+ENV python=${python_version}
 
-# For Python3 modules not available as packages:
-RUN python3 -m pip install pyodbc distro jsonschema
+RUN ${python} -m pip install pyodbc distro jsonschema
 
 # TODO: when externals packages are published for almalinux:8, this section can be uncommented
 #RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
@@ -52,35 +67,6 @@ RUN python3 -m pip install pyodbc distro jsonschema
   #&& \
   #yum clean all && \
   #rm -rf /var/cache/yum /tmp/*
-
-# NOTE: This step cannot be combined with the installation step(s) above. Certain packages will
-# not be installed until certain other packages are installed. It's very sad and confusing.
-#
-# For almalinux:8, the powertools repository should be enabled so that certain developer
-# tools such as ninja-build and help2man can be installed.
-RUN \
-  dnf update -y && \
-  dnf install -y \
-    dnf-plugins-core \
-  && \
-  dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
-  dnf config-manager --set-enabled powertools \
-  && \
-  dnf update -y && \
-  dnf install -y \
-    git \
-    pam-devel \
-    fuse-devel \
-    libcurl-devel \
-    bzip2-devel \
-    libxml2-devel \
-    rpm-build \
-    sudo \
-    ninja-build \
-    help2man \
-  && \
-  dnf clean all && \
-  rm -rf /var/cache/dnf /tmp/*
 
 ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH=${cmake_path}:$PATH
