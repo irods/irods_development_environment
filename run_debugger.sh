@@ -99,7 +99,7 @@ if [ -n "$dry_run" ]; then  # -- print mount options for the debugger run
         echo $'\t'$((++n))$'\t'$x
     done
     echo -e "\nDOCKER_OPTIONS:${DOCKER_OPTIONS}" \
-            "\nDEBUG_OPTIONS:${DEBUG_OPTIONS}"   \
+            "\nDEBUG_OPTIONS:${DEBUG_OPTIONS}"
     exit 1
 else
     build_dir=$(dirname "$0")
