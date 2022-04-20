@@ -15,8 +15,12 @@ RUN dnf install -y \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 RUN dnf install -y \
-        python3 \
+        python3-devel \
+        python3-distro \
+        python3-jsonschema \
+        python3-packaging \
         python3-psutil \
+        python3-pyodbc \
         python3-requests \
         openssl \
         openssl-devel \
@@ -29,18 +33,10 @@ RUN dnf install -y \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 # For Python3 modules not available as packages:
-# python3-devel must be installed because pyodbc requires building
 RUN dnf install -y \
-        gcc-c++ \
-        make \
-        python3-devel \
         python3-pip \
-        python3-packaging \
     && \
     python3 -m pip --no-cache-dir install \
-        pyodbc \
-        distro \
-        jsonschema \
         lief \
     && \
     dnf clean all && \
@@ -79,6 +75,8 @@ RUN dnf install -y \
         libcurl-devel \
         bzip2-devel \
         libxml2-devel \
+        make \
+        gcc-c++ \
         rpm-build \
         sudo \
         ninja-build \
