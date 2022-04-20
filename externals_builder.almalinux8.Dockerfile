@@ -11,7 +11,6 @@ RUN dnf install -y \
         sudo \
         git \
         python3 \
-        python3-pip \
         python3-distro \
         gcc-toolset-11 \
     && \
@@ -24,7 +23,6 @@ WORKDIR /externals
 RUN git clone https://github.com/irods/externals -b "${externals_branch}" /externals && \
     python3 -m venv build_env && \
     source build_env/bin/activate && \
-    python3 -m pip --no-cache-dir install distro && \
     ./install_prerequisites.py && \
     rm -rf /externals && \
     dnf clean all && \

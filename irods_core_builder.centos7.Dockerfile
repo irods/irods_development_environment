@@ -20,7 +20,11 @@ RUN yum install -y \
         python-requests \
         python-distro \
         python2-jsonschema \
+        python3-devel \
         python36 \
+        python3-distro \
+        python3-packaging \
+        python36-jsonschema \
         python36-psutil \
         python36-requests \
         openssl \
@@ -35,18 +39,13 @@ RUN yum install -y \
     rm -rf /var/cache/yum /tmp/*
 
 # For Python3 modules not available as packages:
-# python3-devel must be installed because pyodbc requires building
 RUN yum install -y \
         gcc-c++ \
         make \
-        python3-devel \
         python3-pip \
-        python3-packaging \
     && \
     python3 -m pip --no-cache-dir install \
         pyodbc \
-        distro \
-        jsonschema \
         lief==0.10.1 \
     && \
     yum clean all && \

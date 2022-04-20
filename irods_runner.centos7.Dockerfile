@@ -26,6 +26,8 @@ RUN yum install -y \
         python-requests \
         python2-jsonschema \
         python36 \
+        python3-distro \
+        python36-jsonschema \
         python36-psutil \
         python36-requests \
         openssl \
@@ -49,8 +51,6 @@ RUN yum install -y \
     && \
     python3 -m pip --no-cache-dir install \
         pyodbc \
-        distro \
-        jsonschema \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*

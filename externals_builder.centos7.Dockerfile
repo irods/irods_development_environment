@@ -8,12 +8,14 @@ RUN yum update -y || [ "$?" -eq 100 ] && \
     rm -rf /var/cache/yum /tmp/*
 
 RUN yum install -y \
+        centos-release-scl \
+        epel-release \
+    && \
+    yum install -y \
         sudo \
         git \
         python3 \
-        centos-release-scl \
-    && \
-    yum install -y \
+        python3-distro \
         devtoolset-10-gcc \
         devtoolset-10-gcc-c++ \
     && \
@@ -26,7 +28,6 @@ WORKDIR /externals
 RUN git clone https://github.com/irods/externals -b "${externals_branch}" /externals && \
     python3 -m venv build_env && \
     source build_env/bin/activate && \
-    python3 -m pip --no-cache-dir install distro && \
     ./install_prerequisites.py && \
     rm -rf /externals && \
     yum clean all && \
