@@ -24,6 +24,7 @@ usage()
     echo "                         : -V => --volumes-file"
     echo "                         : -s => --skip-source-build"
     echo "                         : -g => --debug-source-build"
+    echo "                         : -j => --jobs"
     exit 127
 } >&2
 
@@ -43,6 +44,7 @@ while [[ $1 = -* ]]; do
         -n|--no-cache) NO_CACHE="--no-cache";;
         -g|--debug*) do_source_build=".--debug";;
         -N|--ninja) BUILD_OPTIONS+=" --ninja";;
+        -j|--jobs) BUILD_OPTIONS+=" --jobs $2"; shift;;
         *) usage bad option "'$1'" ;;
     esac
     shift
