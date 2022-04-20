@@ -132,7 +132,7 @@ else
     docker build --build-arg debugger_base=${base_image}  -f build_debuggers."$OS_NAME".Dockerfile -t "${DEBUGGER_IMAGE}" . ${NO_CACHE}
     if [ -n "$do_source_build" ]; then
         docker build -t "${BUILDER_IMAGE}" -f irods_core_builder."$OS_NAME".Dockerfile . ${NO_CACHE}
-        docker run --rm "${vol_mounts[@]}" "${BUILDER_IMAGE}" ${do_source_build:1} ${BUILD_OPTIONS}
+        docker run --rm "${vol_mounts[@]}" -it -e "TERM=$TERM" "${BUILDER_IMAGE}" ${do_source_build:1} ${BUILD_OPTIONS}
     fi
     docker build --build-arg runner_base="${DEBUGGER_IMAGE}" -t "${RUNNER_IMAGE}" -f irods_runner."$OS_NAME".Dockerfile . ${NO_CACHE}
     echo -n "$((RUNNER_INT+1))" > "${RUNNER_INT_FILE}"
