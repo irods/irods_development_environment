@@ -117,7 +117,11 @@ echo "beginning build of iCommands"
 echo "========================================="
 
 # Install packages for building iCommands
-install_packages /irods_packages/irods-{runtime,dev}*."${file_extension}"
+if [ "${file_extension}" == "rpm" ] ; then
+    install_packages /irods_packages/irods-{runtime,devel}*."${file_extension}"
+else
+    install_packages /irods_packages/irods-{runtime,dev}*."${file_extension}"
+fi
 
 # Build iCommands
 mkdir -p /icommands_build && cd /icommands_build
