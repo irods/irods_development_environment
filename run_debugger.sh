@@ -3,6 +3,9 @@
 volumes_file=""
 dry_run=""
 do_source_build="."
+builder_build="y"
+runner_build="y"
+runner_run="y"
 OS_NAME="ubuntu18"
 DEVROOT=""
 NO_CACHE=""
@@ -24,7 +27,10 @@ usage()
     echo "                         : -d => --devroot"
     echo "                         : -p => --platform-os (set to '$OS_NAME')"
     echo "                         : -V => --volumes-file"
+    echo "                         : -b => --skip-builder-build"
     echo "                         : -s => --skip-source-build"
+    echo "                         : -e => --skip-runner-build"
+    echo "                         : -u => --skip-runner-run"
     echo "                         : -g => --debug-source-build"
     echo "                         : -j => --jobs"
     exit 127
@@ -42,7 +48,10 @@ while [[ $1 = -* ]]; do
         -r|--volume-ro) shift; vol_mounts+=( "-v"  "$1":"$2":ro ); shift ;;
         -w|--volume-rw) shift; vol_mounts+=( "-v"  "$1":"$2" )   ; shift ;;
         -d|--devroot) shift; DEVROOT="$1";;
+        -b|--skip-builder-build) builder_build="";;
         -s|--skip-source-build) do_source_build="";;
+        -e|--skip-runner-build) runner_build="";;
+        -u|--skip-runner-run) runner_run="";;
         -n|--no-cache) NO_CACHE="--no-cache";;
         -g|--debug*) do_source_build=".--debug";;
         -N|--ninja) BUILD_OPTIONS+=" --ninja";;
@@ -130,11 +139,17 @@ else
     build_dir=$(dirname "$0")
     cd "$build_dir" || { echo >&2 "cannot cd to docker build environment"; exit 2; }
     docker build --build-arg debugger_base=${base_image}  -f build_debuggers."$OS_NAME".Dockerfile -t "${DEBUGGER_IMAGE}" . ${NO_CACHE}
-    if [ -n "$do_source_build" ]; then
+    if [ -n "$builder_build" ] || [ -n "$do_source_build" ]; then
         docker build -t "${BUILDER_IMAGE}" -f irods_core_builder."$OS_NAME".Dockerfile . ${NO_CACHE}
+    fi
+    if [ -n "$do_source_build" ]; then
         docker run --rm "${vol_mounts[@]}" -it -e "TERM=$TERM" "${BUILDER_IMAGE}" ${do_source_build:1} ${BUILD_OPTIONS}
     fi
-    docker build --build-arg runner_base="${DEBUGGER_IMAGE}" -t "${RUNNER_IMAGE}" -f irods_runner."$OS_NAME".Dockerfile . ${NO_CACHE}
-    echo -n "$((RUNNER_INT+1))" > "${RUNNER_INT_FILE}"
-    docker run "${vol_mounts[@]}" ${DOCKER_OPTIONS} ${DEBUG_OPTIONS} --name "${RUNNER_NAME}" "${RUNNER_IMAGE}"
+    if [ -n "$runner_build" ]; then
+        docker build --build-arg runner_base="${DEBUGGER_IMAGE}" -t "${RUNNER_IMAGE}" -f irods_runner."$OS_NAME".Dockerfile . ${NO_CACHE}
+    fi
+    if [ -n "$runner_run" ]; then
+        echo -n "$((RUNNER_INT+1))" > "${RUNNER_INT_FILE}"
+        docker run "${vol_mounts[@]}" ${DOCKER_OPTIONS} ${DEBUG_OPTIONS} --name "${RUNNER_NAME}" "${RUNNER_IMAGE}"
+    fi
 fi
