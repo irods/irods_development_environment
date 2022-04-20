@@ -84,6 +84,11 @@ while [ -n "$1" ] ; do
     shift
 done
 
+common_cmake_args=(
+    -DCMAKE_COLOR_MAKEFILE=ON
+    -DCMAKE_VERBOSE_MAKEFILE=ON
+)
+
 if [[ ! -z ${custom_externals} ]] ; then
     install_packages "${custom_externals}"/irods-externals-*."${file_extension}"
 fi
@@ -96,7 +101,7 @@ echo "========================================="
 
 # Build iRODS
 mkdir -p /irods_build && cd /irods_build
-cmake ${make_program_config} ${debug_config} ${unit_test_config} /irods_source
+cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} /irods_source
 if [[ -z ${build_jobs} ]] ; then
     ${make_program} package
 else
@@ -125,7 +130,7 @@ fi
 
 # Build iCommands
 mkdir -p /icommands_build && cd /icommands_build
-cmake ${make_program_config} ${debug_config} /icommands_source
+cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" /icommands_source
 if [[ -z ${build_jobs} ]] ; then
     ${make_program} package
 else
