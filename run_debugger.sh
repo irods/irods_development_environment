@@ -63,6 +63,9 @@ done
 
 declare -A Os_Map=( ['ubuntu16']='ubuntu:16.04'
                     ['ubuntu18']='ubuntu:18.04'
+                    ['ubuntu20']='ubuntu:20.04'
+                    ['debian11']='debian:11'
+                    ['almalinux8']='almalinux:8'
                     ['centos7']='centos:7' )
 
 base_image=${Os_Map["$OS_NAME"]}
@@ -105,6 +108,10 @@ DEBUGGER_IMAGE="irods_debuggers.${OS_NAME}"
 BUILDER_IMAGE="irods_core_builder.${OS_NAME}"
 RUNNER_IMAGE="irods_runner.${OS_NAME}"
 
+DEBUGGER_DOCKERFILE="build_debuggers.${OS_NAME}.Dockerfile"
+BUILDER_DOCKERFILE="irods_core_builder.${OS_NAME}.Dockerfile"
+RUNNER_DOCKERFILE="irods_runner.${OS_NAME}.Dockerfile"
+
 # get/init runner number
 RUNNER_INT_FILE="${CACHE_DIR}/new_runner_number.${OS_NAME}"
 RUNNER_INT="0"
@@ -123,33 +130,46 @@ done
 
 if [ -n "$dry_run" ]; then  # -- print mount options for the debugger run
     echo "--- using OS_NAME='$OS_NAME' base_image='$base_image' ---"
-    echo "    DEBUGGER_IMAGE:   '${DEBUGGER_IMAGE}'"
+    if [ -e "${DEBUGGER_DOCKERFILE}" ]; then
+        echo "    DEBUGGER_IMAGE:   '${DEBUGGER_IMAGE}'"
+    fi
     echo "    BUILDER_IMAGE:    '${BUILDER_IMAGE}'"
-    echo "    RUNNER_IMAGE:     '${RUNNER_IMAGE}'"
-    echo "    RUNNER_CONTAINER: '${RUNNER_NAME}'"
+    if [ -e "${RUNNER_DOCKERFILE}" ]; then
+        echo "    RUNNER_IMAGE:     '${RUNNER_IMAGE}'"
+        echo "    RUNNER_CONTAINER: '${RUNNER_NAME}'"
+    fi
     echo -e "\ndocker run \n"
     n=0; echo $'\t'$n
     for x in "${vol_mounts[@]}"; do
         echo $'\t'$((++n))$'\t'$x
     done
-    echo -e "\nDOCKER_OPTIONS:${DOCKER_OPTIONS}" \
-            "\nDEBUG_OPTIONS:${DEBUG_OPTIONS}"
+    if [ -e "${RUNNER_DOCKERFILE}" ]; then
+        echo -e "\nDOCKER_OPTIONS:${DOCKER_OPTIONS}" \
+                "\nDEBUG_OPTIONS:${DEBUG_OPTIONS}"
+    fi
     exit 1
 else
     build_dir=$(dirname "$0")
     cd "$build_dir" || { echo >&2 "cannot cd to docker build environment"; exit 2; }
-    docker build --build-arg debugger_base=${base_image}  -f build_debuggers."$OS_NAME".Dockerfile -t "${DEBUGGER_IMAGE}" . ${NO_CACHE}
+    if [ -e "${DEBUGGER_DOCKERFILE}" ]; then
+        docker build --build-arg debugger_base=${base_image}  -f "${DEBUGGER_DOCKERFILE}" -t "${DEBUGGER_IMAGE}" . ${NO_CACHE}
+        RUNNER_BASE="${DEBUGGER_IMAGE}"
+    else
+        RUNNER_BASE="${base_image}"
+    fi
     if [ -n "$builder_build" ] || [ -n "$do_source_build" ]; then
-        docker build -t "${BUILDER_IMAGE}" -f irods_core_builder."$OS_NAME".Dockerfile . ${NO_CACHE}
+        docker build -t "${BUILDER_IMAGE}" -f "${BUILDER_DOCKERFILE}" . ${NO_CACHE}
     fi
     if [ -n "$do_source_build" ]; then
         docker run --rm "${vol_mounts[@]}" -it -e "TERM=$TERM" "${BUILDER_IMAGE}" ${do_source_build:1} ${BUILD_OPTIONS}
     fi
-    if [ -n "$runner_build" ]; then
-        docker build --build-arg runner_base="${DEBUGGER_IMAGE}" -t "${RUNNER_IMAGE}" -f irods_runner."$OS_NAME".Dockerfile . ${NO_CACHE}
-    fi
-    if [ -n "$runner_run" ]; then
-        echo -n "$((RUNNER_INT+1))" > "${RUNNER_INT_FILE}"
-        docker run "${vol_mounts[@]}" ${DOCKER_OPTIONS} ${DEBUG_OPTIONS} --name "${RUNNER_NAME}" "${RUNNER_IMAGE}"
+    if [ -e "${RUNNER_DOCKERFILE}" ]; then
+        if [ -n "$runner_build" ]; then
+            docker build --build-arg runner_base="${RUNNER_BASE}" -t "${RUNNER_IMAGE}" -f "${RUNNER_DOCKERFILE}" . ${NO_CACHE}
+        fi
+        if [ -n "$runner_run" ]; then
+            echo -n "$((RUNNER_INT+1))" > "${RUNNER_INT_FILE}"
+            docker run "${vol_mounts[@]}" ${DOCKER_OPTIONS} ${DEBUG_OPTIONS} --name "${RUNNER_NAME}" "${RUNNER_IMAGE}"
+        fi
     fi
 fi
