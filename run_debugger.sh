@@ -12,6 +12,7 @@ NO_CACHE=""
 BUILD_OPTIONS=""
 DOCKER_OPTIONS="
                  -d -i -t "
+RUNNER_SHM="256m"
 DEBUG_OPTIONS="
                  --cap-add=SYS_PTRACE
                  --security-opt seccomp=unconfined
@@ -32,6 +33,7 @@ usage()
     echo "                         : -e => --skip-runner-build"
     echo "                         : -u => --skip-runner-run"
     echo "                         : -g => --debug-source-build"
+    echo "                         : -m => --runner-shm"
     echo "                         : -j => --jobs"
     exit 127
 } >&2
@@ -55,6 +57,7 @@ while [[ $1 = -* ]]; do
         -n|--no-cache) NO_CACHE="--no-cache";;
         -g|--debug*) do_source_build=".--debug";;
         -N|--ninja) BUILD_OPTIONS+=" --ninja";;
+        -m|--runner-shm) RUNNER_SHM="$2"; shift;;
         -j|--jobs) BUILD_OPTIONS+=" --jobs $2"; shift;;
         *) usage bad option "'$1'" ;;
     esac
@@ -103,6 +106,8 @@ if [ "${#vol_mounts[@]}" -eq 0 ]; then
         vol_mounts+=("-v" "$rlpath:$d:ro")
     done
 fi
+
+DOCKER_OPTIONS+=" --shm-size=${RUNNER_SHM}"
 
 DEBUGGER_IMAGE="irods_debuggers.${OS_NAME}"
 BUILDER_IMAGE="irods_core_builder.${OS_NAME}"
