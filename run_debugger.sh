@@ -35,6 +35,7 @@ usage()
     echo "                         : -g => --debug-source-build"
     echo "                         : -m => --runner-shm"
     echo "                         : -j => --jobs"
+    echo "                         : -P => --port"
     exit 127
 } >&2
 
@@ -59,6 +60,7 @@ while [[ $1 = -* ]]; do
         -N|--ninja) BUILD_OPTIONS+=" --ninja";;
         -m|--runner-shm) RUNNER_SHM="$2"; shift;;
         -j|--jobs) BUILD_OPTIONS+=" --jobs $2"; shift;;
+        -P|--port) DOCKER_OPTIONS+=" -p $2"; shift;;
         *) usage bad option "'$1'" ;;
     esac
     shift
