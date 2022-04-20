@@ -66,7 +66,7 @@ core_only=0
 make_program="make"
 make_program_config=""
 build_jobs=0
-debug_config=""
+debug_config="-DCMAKE_BUILD_TYPE=Release"
 unit_test_config="-DIRODS_UNIT_TESTS_BUILD=YES"
 custom_externals=""
 
