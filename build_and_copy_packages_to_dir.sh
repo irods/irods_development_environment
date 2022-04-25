@@ -42,6 +42,7 @@ fi
 
 install_packages() {
     if [ "${package_manager}" == "apt-get" ] ; then
+        apt-get update
         dpkg -i "$@" || true
         apt-get install -fy --allow-downgrades
         for pkg_file in "$@" ; do
