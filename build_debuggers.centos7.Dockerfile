@@ -150,6 +150,10 @@ RUN yum install -y \
         vim-enhanced \
         tmux \
         tig \
+        lsof \
+        which \
+        less \
+        file \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
