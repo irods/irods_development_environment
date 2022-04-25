@@ -42,7 +42,6 @@ RUN apt-get update && \
         python3 \
         python3-distro \
         python3-jsonschema \
-        python3-pip \
         python3-psutil \
         python3-requests \
         sudo \
@@ -51,7 +50,27 @@ RUN apt-get update && \
         wget \
         zlib1g-dev \
     && \
-    pip3 --no-cache-dir install lief && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
+
+RUN apt-get update && \
+    apt-get install -y \
+        cmake \
+        python3-pip \
+        libspdlog-dev \
+    && \
+    python3 -m pip --no-cache-dir install \
+        lief \
+            --global-option="--lief-no-cache" \
+            --global-option="--ninja" \
+            --global-option="--lief-no-pe" \
+            --global-option="--lief-no-macho" \
+            --global-option="--lief-no-android" \
+            --global-option="--lief-no-art" \
+            --global-option="--lief-no-vdex" \
+            --global-option="--lief-no-oat" \
+            --global-option="--lief-no-dex" \
+    && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
