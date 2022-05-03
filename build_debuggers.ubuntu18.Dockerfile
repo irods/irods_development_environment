@@ -43,15 +43,17 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz && \
-    tar xzf gdb*.tar.gz && \
-    cd gdb*/ && \
+ARG gdb_version="8.3.1"
+
+RUN wget "http://ftp.gnu.org/gnu/gdb/gdb-${gdb_version}.tar.gz" && \
+    tar xzf "gdb-${gdb_version}.tar.gz" && \
+    cd "gdb-${gdb_version}" && \
     export CCACHE_DISABLE=1 && \
     ./configure --prefix=${tools_prefix} --with-python --with-curses --enable-tui && \
     make -j${parallelism} && \
     make install && \
     cd .. && \
-    rm -rf gdb*.tar.gz gdb*/
+    rm -rf "gdb-${gdb_version}.tar.gz" "gdb-${gdb_version}"
 
 #--------
 # rr
