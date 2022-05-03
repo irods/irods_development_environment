@@ -75,14 +75,16 @@ RUN wget "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-$
 #--------
 # valgrind
 
-RUN wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2 && \
-    tar xjf valgrind*tar.bz2 && \
-    cd valgrind*/ && \
+ARG valgrind_version="3.15.0"
+
+RUN wget "https://sourceware.org/pub/valgrind/valgrind-${valgrind_version}.tar.bz2" && \
+    tar xjf "valgrind-${valgrind_version}.tar.bz2" && \
+    cd "valgrind-${valgrind_version}" && \
     export CCACHE_DISABLE=1 && \
     ./configure --prefix=${tools_prefix} && \
     make -j${parallelism} install && \
     cd .. && \
-    rm -rf valgrind*tar.bz2 valgrind*/
+    rm -rf "valgrind-${valgrind_version}.tar.bz2" "valgrind-${valgrind_version}"
 
 #--------
 # utils
