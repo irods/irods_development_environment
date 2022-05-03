@@ -59,57 +59,25 @@ RUN pip3 --no-cache-dir install pexpect
 #--------
 # rr
 
-ARG rr_commit="4513b23c8092097dc42c73f3cbaf4cfaebd04efe"
-
 RUN yum install -y \
-        capnproto \
-        capnproto-devel \
-        capnproto-libs \
-        ninja-build \
-        make \
-        git \
+        python36-urllib3 \
+        binutils \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-RUN rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
-    wget -qO - https://core-dev.irods.org/renci-irods-core-dev.yum.repo | tee /etc/yum.repos.d/renci-irods-core-dev.yum.repo && \
-    yum check-update -y || { rc=$?; [ "$rc" -eq 100 ] && exit 0; exit "$rc"; } && \
+ARG rr_version="5.5.0"
+
+RUN yum localinstall -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
-
-RUN yum install -y \
-        irods-externals-clang-runtime6.0-0 \
-        irods-externals-clang6.0-0 \
-        irods-externals-cmake3.11.4-0 \
-    && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
-
-RUN git clone http://github.com/mozilla/rr && \
-    cd rr && \
-    { [ -z "${rr_commit}" ] || git checkout "${rr_commit}"; } && \
-    mkdir ../obj && cd ../obj && \
-    export \
-        LD_LIBRARY_PATH=/opt/irods-externals/clang-runtime6.0-0/lib \
-        LD_RUN_PATH=/opt/irods-externals/clang-runtime6.0-0/lib \
-        CC=/opt/irods-externals/clang6.0-0/bin/clang \
-        CXX="/opt/irods-externals/clang6.0-0/bin/clang++ -stdlib=libc++" \
-        CCACHE_DISABLE=1 \
-    && \
-    /opt/irods-externals/cmake3.11.4-0/bin/cmake \
-        -DCMAKE_INSTALL_PREFIX:PATH="${tools_prefix}" \
-        ../rr \
-    && \
-    /opt/irods-externals/cmake3.11.4-0/bin/cmake --build . --target install -- -j${parallelism} && \
-    cd .. && \
-    rm -rf obj rr
 
 #--------
 # gdb
 
 RUN yum install -y \
         texinfo \
+        make \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*

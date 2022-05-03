@@ -28,10 +28,16 @@ RUN apt-get update && \
     apt-get install -y \
         texinfo \
         libncurses5-dev \
+        pkg-config \
         g++ \
+        g++-multilib \
         wget \
         make \
         python-dev \
+        manpages-dev \
+        ccache \
+        coreutils \
+        python3-pexpect \
     && \
     apt-get remove -y python3-dev && \
     apt-get clean && \
@@ -50,36 +56,19 @@ RUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz && \
 #--------
 # rr
 
-ARG rr_commit="4513b23c8092097dc42c73f3cbaf4cfaebd04efe"
-
 RUN apt-get update && \
     apt-get install -y \
-        ccache \
-        cmake \
-        g++-multilib \
-        gdb \
-        pkg-config \
-        coreutils \
-        python3-pexpect \
-        manpages-dev \
-        git \
-        ninja-build \
-        capnproto \
-        libcapnp-dev \
+        python3-urllib3 \
+        binutils \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN git clone http://github.com/mozilla/rr && \
-    cd rr && \
-    { [ -z "${rr_commit}" ] || git checkout "${rr_commit}"; } && \
-    mkdir ../obj && cd ../obj && \
-    export CCACHE_DISABLE=1 && \
-    cmake -DCMAKE_INSTALL_PREFIX:PATH=${tools_prefix} ../rr && \
-    make -j${parallelism} && \
-    make install && \
-    cd .. && \
-    rm -rf obj rr
+ARG rr_version="5.5.0"
+
+RUN wget "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.deb" && \
+    dpkg -i "rr-${rr_version}-Linux-x86_64.deb" && \
+    rm -rf /tmp/*
 
 #--------
 # valgrind
