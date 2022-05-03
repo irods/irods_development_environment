@@ -87,6 +87,24 @@ RUN wget "https://sourceware.org/pub/valgrind/valgrind-${valgrind_version}.tar.b
     rm -rf "valgrind-${valgrind_version}.tar.bz2" "valgrind-${valgrind_version}"
 
 #--------
+# lldb
+
+ARG lldb_version="12"
+
+RUN apt-get update && \
+    apt-get install -y \
+        apt-transport-https \
+    && \
+    wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+    echo "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-${lldb_version} main" > /etc/apt/sources.list.d/llvm.list && \
+    apt-get update && \
+    apt-get install -y \
+        lldb-${lldb_version} \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
+
+#--------
 # utils
 
 RUN apt-get update && \
