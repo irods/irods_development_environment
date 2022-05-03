@@ -15,11 +15,17 @@ RUN mkdir -p  ${tools_prefix}
 
 WORKDIR /tmp
 
+RUN yum install -y \
+        epel-release \
+        centos-release-scl \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
 #--------
 # TODO: Figure out what section these go in
 
 RUN yum install -y \
-        epel-release \
         sudo \
         wget \
         gcc-c++ \
@@ -57,6 +63,16 @@ RUN yum install -y \
 RUN pip3 --no-cache-dir install pexpect
 
 #--------
+# valgrind, gdb
+
+RUN yum install -y devtoolset-11 && \
+    echo "#!/bin/sh" > /etc/profile.d/devtoolset-11.sh && \
+    echo "" >> /etc/profile.d/devtoolset-11.sh && \
+    echo ". /opt/rh/devtoolset-11/enable" >> /etc/profile.d/devtoolset-11.sh && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
+#--------
 # rr
 
 RUN yum install -y \
@@ -71,44 +87,6 @@ ARG rr_version="5.5.0"
 RUN yum localinstall -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
-
-#--------
-# gdb
-
-RUN yum install -y \
-        texinfo \
-        make \
-    && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
-
-RUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.1.tar.gz && \
-    tar xzf gdb*.tar.gz && \
-    cd gdb*/ && \
-    export CCACHE_DISABLE=1 && \
-    ./configure --prefix=${tools_prefix} --with-python --with-curses --enable-tui && \
-    make -j${parallelism} && \
-    make install && \
-    cd .. && \
-    rm -rf gdb*.tar.gz gdb*/
-
-#--------
-# valgrind
-
-RUN yum install -y \
-        bzip2 \
-    && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
-
-RUN wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2 && \
-    tar xjf valgrind*tar.bz2 && \
-    cd valgrind*/ && \
-    export CCACHE_DISABLE=1 && \
-    ./configure --prefix=${tools_prefix} && \
-    make -j${parallelism} install && \
-    cd .. && \
-    rm -rf valgrind*tar.bz2 valgrind*/
 
 #--------
 # utils
