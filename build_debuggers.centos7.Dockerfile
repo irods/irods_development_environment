@@ -73,6 +73,16 @@ RUN yum install -y devtoolset-11 && \
     rm -rf /var/cache/yum /tmp/*
 
 #--------
+# lldb
+
+RUN yum -y install llvm-toolset-7 && \
+    echo "#!/bin/sh" > /etc/profile.d/llvm-toolset-7.sh && \
+    echo "" >> /etc/profile.d/llvm-toolset-7.sh && \
+    echo ". /opt/rh/llvm-toolset-7/enable" >> /etc/profile.d/llvm-toolset-7.sh && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
+#--------
 # rr
 
 RUN yum install -y \
