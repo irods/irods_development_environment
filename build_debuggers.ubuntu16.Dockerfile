@@ -1,4 +1,4 @@
-ARG  debugger_base
+ARG debugger_base=ubuntu:16.04
 FROM ${debugger_base}
 
 SHELL [ "/bin/bash", "-c" ]
