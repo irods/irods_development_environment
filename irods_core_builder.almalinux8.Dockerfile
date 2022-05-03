@@ -42,20 +42,23 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
-# TODO: when externals packages are published for almalinux:8, this section can be uncommented
-#RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
-#    wget -qO - https://packages.irods.org/renci-irods.yum.repo | tee /etc/yum.repos.d/renci-irods.yum.repo && \
-#    rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
-#    wget -qO - https://core-dev.irods.org/renci-irods-core-dev.yum.repo | tee /etc/yum.repos.d/renci-irods-core-dev.yum.repo && \
-#    yum check-update -y || { rc=$?; [ "$rc" -eq 100 ] && exit 0; exit "$rc"; } && \
-#    yum clean all && \
-#    rm -rf /var/cache/yum /tmp/*
+RUN dnf install -y \
+        dnf-plugin-config-manager \
+    && \
+    rpm --import https://packages.irods.org/irods-signing-key.asc && \
+    dnf config-manager -y --add-repo https://packages.irods.org/renci-irods.yum.repo && \
+    dnf config-manager -y --set-enabled renci-irods && \
+    rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
+    dnf config-manager -y --add-repo https://core-dev.irods.org/renci-irods-core-dev.yum.repo && \
+    dnf config-manager -y --set-enabled renci-irods-core-dev && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
-#RUN yum install -y \
-#        'irods-externals*' \
-#    && \
-#    yum clean all && \
-#    rm -rf /var/cache/yum /tmp/*
+RUN dnf install -y \
+        'irods-externals*' \
+    && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 # NOTE: This step cannot be combined with the installation step(s) above. Certain packages will
 # not be installed until certain other packages are installed. It's very sad and confusing.
