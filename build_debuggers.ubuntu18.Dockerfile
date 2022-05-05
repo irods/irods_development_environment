@@ -26,34 +26,22 @@ WORKDIR /tmp
 
 RUN apt-get update && \
     apt-get install -y \
-        texinfo \
-        libncurses5-dev \
-        pkg-config \
-        g++ \
-        g++-multilib \
-        wget \
-        make \
-        python-dev \
-        manpages-dev \
-        ccache \
+        apt-transport-https \
+        software-properties-common \
         coreutils \
         python3-pexpect \
     && \
-    apt-get remove -y python3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
-ARG gdb_version="8.3.1"
-
-RUN wget "http://ftp.gnu.org/gnu/gdb/gdb-${gdb_version}.tar.gz" && \
-    tar xzf "gdb-${gdb_version}.tar.gz" && \
-    cd "gdb-${gdb_version}" && \
-    export CCACHE_DISABLE=1 && \
-    ./configure --prefix=${tools_prefix} --with-python --with-curses --enable-tui && \
-    make -j${parallelism} && \
-    make install && \
-    cd .. && \
-    rm -rf "gdb-${gdb_version}.tar.gz" "gdb-${gdb_version}"
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test && \
+    apt-get update && \
+    apt-get install -y \
+        gdb \
+        gdbserver \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
 
 #--------
 # rr
@@ -62,6 +50,7 @@ RUN apt-get update && \
     apt-get install -y \
         python3-urllib3 \
         binutils \
+        wget \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
@@ -74,6 +63,21 @@ RUN wget "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-$
 
 #--------
 # valgrind
+
+RUN apt-get update && \
+    apt-get install -y \
+        texinfo \
+        libncurses5-dev \
+        pkg-config \
+        g++ \
+        g++-multilib \
+        make \
+        python-dev \
+        manpages-dev \
+        ccache \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
 
 ARG valgrind_version="3.15.0"
 
