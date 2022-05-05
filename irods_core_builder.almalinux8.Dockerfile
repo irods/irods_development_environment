@@ -18,7 +18,6 @@ RUN dnf install -y \
         python3-devel \
         python3-distro \
         python3-jsonschema \
-        python3-packaging \
         python3-psutil \
         python3-pyodbc \
         python3-requests \
@@ -84,6 +83,7 @@ RUN dnf install -y \
         sudo \
         ninja-build \
         help2man \
+        python3-packaging \
     && \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
