@@ -38,19 +38,6 @@ RUN yum install -y \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
-# For Python3 modules not available as packages:
-RUN yum install -y \
-        gcc-c++ \
-        make \
-        python3-pip \
-    && \
-    python3 -m pip --no-cache-dir install \
-        pyodbc \
-        lief==0.10.1 \
-    && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
-
 RUN rpm --import https://packages.irods.org/irods-signing-key.asc && \
     wget -qO - https://packages.irods.org/renci-irods.yum.repo | tee /etc/yum.repos.d/renci-irods.yum.repo && \
     rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
@@ -80,10 +67,42 @@ RUN yum install -y \
         zlib-devel \
         python-devel \
         make \
+        gcc \
         gcc-c++ \
         help2man \
         rpm-build \
         sudo \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum /tmp/*
+
+# For Python3 modules not available as packages:
+RUN yum install -y \
+        python3-pip \
+        cmake3 \
+        spdlog-devel \
+        centos-release-scl \
+    && \
+    yum install -y \
+        devtoolset-11 \
+    && \
+    python3 -m pip --no-cache-dir install \
+        pyodbc \
+    && \
+    mkdir /tmp/cmake3-bin && \
+    ln -s /usr/bin/cmake3 /tmp/cmake3-bin/cmake && \
+    source /opt/rh/devtoolset-11/enable && \
+    PATH=/tmp/cmake3-bin:$PATH python3 -m pip --no-cache-dir install \
+        lief \
+            --global-option="--lief-no-cache" \
+            --global-option="--ninja" \
+            --global-option="--lief-no-pe" \
+            --global-option="--lief-no-macho" \
+            --global-option="--lief-no-android" \
+            --global-option="--lief-no-art" \
+            --global-option="--lief-no-vdex" \
+            --global-option="--lief-no-oat" \
+            --global-option="--lief-no-dex" \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
