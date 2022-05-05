@@ -30,14 +30,11 @@ RUN yum install -y \
         python36-jsonschema \
         python36-psutil \
         python36-requests \
-        openssl \
         openssl-devel \
-        super \
         lsof \
         postgresql-server \
         unixODBC-devel \
         pyodbc \
-        libjson-perl \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
