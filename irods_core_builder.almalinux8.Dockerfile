@@ -31,16 +31,6 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
-# For Python3 modules not available as packages:
-RUN dnf install -y \
-        python3-pip \
-    && \
-    python3 -m pip --no-cache-dir install \
-        lief \
-    && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
-
 RUN dnf install -y \
         dnf-plugin-config-manager \
     && \
@@ -78,12 +68,34 @@ RUN dnf install -y \
         bzip2-devel \
         libxml2-devel \
         make \
+        gcc \
         gcc-c++ \
         rpm-build \
         sudo \
         ninja-build \
         help2man \
         python3-packaging \
+    && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+
+# For Python3 modules not available as packages:
+RUN dnf install -y \
+        python3-pip \
+        cmake \
+        spdlog-devel \
+    && \
+    python3 -m pip --no-cache-dir install \
+        lief \
+            --global-option="--lief-no-cache" \
+            --global-option="--ninja" \
+            --global-option="--lief-no-pe" \
+            --global-option="--lief-no-macho" \
+            --global-option="--lief-no-android" \
+            --global-option="--lief-no-art" \
+            --global-option="--lief-no-vdex" \
+            --global-option="--lief-no-oat" \
+            --global-option="--lief-no-dex" \
     && \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
