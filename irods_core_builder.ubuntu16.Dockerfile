@@ -35,17 +35,34 @@ RUN apt-get update && \
         postgresql \
         python \
         python-dev \
+        python-pip \
         python-jsonschema \
+        python-packaging \
         python-psutil \
+        python-pyodbc \
         python-requests \
+        python3 \
+        python3-dev \
         python3-pip \
+        python3-jsonschema \
+        python3-packaging \
+        python3-psutil \
+        python3-pyodbc \
+        python3-requests \
         sudo \
         super \
         unixodbc-dev \
         wget \
         zlib1g-dev \
     && \
-    pip3 --no-cache-dir install lief==0.10.1 && \
+    pip --no-cache-dir install --upgrade 'pip<21.0' && \
+    pip --no-cache-dir install \
+        distro \
+    && \
+    pip3 --no-cache-dir install \
+        distro \
+        lief==0.10.1 \
+    && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
