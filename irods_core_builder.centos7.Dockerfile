@@ -14,19 +14,8 @@ RUN yum install -y \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
+# python 2 and 3 must be installed separately because yum will ignore/discard python2
 RUN yum install -y \
-        python \
-        python2-psutil \
-        python-requests \
-        python-distro \
-        python2-jsonschema \
-        python3-devel \
-        python36 \
-        python3-distro \
-        python3-packaging \
-        python36-jsonschema \
-        python36-psutil \
-        python36-requests \
         openssl \
         openssl-devel \
         super \
@@ -35,6 +24,28 @@ RUN yum install -y \
         unixODBC-devel \
         libjson-perl \
     && \
+    yum install -y \
+        python \
+        python-devel \
+        python-distro \
+        python2-packaging \
+        python2-pip \
+        python2-jsonschema \
+        python2-psutil \
+        python-requests \
+        pyodbc \
+    && \
+    yum install -y \
+        python36 \
+        python3-devel \
+        python3-distro \
+        python3-packaging \
+        python3-pip \
+        python36-jsonschema \
+        python36-psutil \
+        python36-requests \
+    && \
+    pip --no-cache-dir install --upgrade 'pip<21.0' && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
@@ -65,7 +76,6 @@ RUN yum install -y \
         bzip2-devel \
         libxml2-devel \
         zlib-devel \
-        python-devel \
         make \
         gcc \
         gcc-c++ \
@@ -78,7 +88,6 @@ RUN yum install -y \
 
 # For Python3 modules not available as packages:
 RUN yum install -y \
-        python3-pip \
         cmake3 \
         spdlog-devel \
         centos-release-scl \
