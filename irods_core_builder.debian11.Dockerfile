@@ -36,12 +36,14 @@ RUN apt-get update && \
         ninja-build \
         odbc-postgresql \
         postgresql \
-        python-dev \
         python3 \
+        python3-dev \
+        python3-pip \
         python3-distro \
         python3-jsonschema \
-        python3-pip \
+        python3-packaging \
         python3-psutil \
+        python3-pyodbc \
         python3-requests \
         sudo \
         super \
@@ -53,7 +55,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
-# TODO: Uncomment this section when externals packages are available for this platform
 RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - && \
     echo "deb [arch=amd64] https://packages.irods.org/apt/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/renci-irods.list && \
     wget -qO - https://core-dev.irods.org/irods-core-dev-signing-key.asc | apt-key add - && \

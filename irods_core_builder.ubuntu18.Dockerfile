@@ -36,13 +36,20 @@ RUN apt-get update && \
         postgresql \
         python \
         python-dev \
+        python-pip \
+        python-distro \
         python-jsonschema \
+        python-packaging \
         python-psutil \
+        python-pyodbc \
         python-requests \
         python3 \
+        python3-pip \
         python3-distro \
         python3-jsonschema \
+        python3-packaging \
         python3-psutil \
+        python3-pyodbc \
         python3-requests \
         sudo \
         super \
@@ -50,13 +57,13 @@ RUN apt-get update && \
         wget \
         zlib1g-dev \
     && \
+    pip --no-cache-dir install --upgrade 'pip<21.0' && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN apt-get update && \
     apt-get install -y \
         cmake \
-        python3-pip \
         libspdlog-dev \
     && \
     python3 -m pip --no-cache-dir install \
