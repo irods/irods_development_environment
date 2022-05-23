@@ -24,6 +24,9 @@ RUN apt-get update && \
         python \
         python-pip \
         python-setuptools \
+        python3 \
+        python3-pip \
+        python3-setuptools \
         sudo \
         wget \
     && \
@@ -31,8 +34,12 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN git clone https://github.com/irods/irods_python_ci_utilities && \
-    pip --no-cache-dir install -e /irods_python_ci_utilities
+ENV python="python3"
+
+# see https://pip.pypa.io/en/stable/topics/vcs-support/
+ARG python_ci_utilities_vcs="git+https://github.com/irods/irods_python_ci_utilities.git@main"
+
+RUN "${python}" -m pip --no-cache-dir install "${python_ci_utilities_vcs}"
 
 ENV file_extension="deb"
 ENV package_manager="apt-get"
