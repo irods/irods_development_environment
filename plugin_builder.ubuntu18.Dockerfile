@@ -27,6 +27,7 @@ RUN apt-get update && \
         sudo \
         wget \
     && \
+    pip --no-cache-dir install --upgrade 'pip<21.0' && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
