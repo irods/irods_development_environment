@@ -19,22 +19,28 @@ RUN yum install -y \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
 
+# python 2 and 3 must be installed separately because yum will ignore/discard python2
 RUN yum install -y \
         rsyslog \
+        openssl-devel \
+        lsof \
+        postgresql-server \
+        unixODBC-devel \
+    && \
+    yum install -y \
         python \
+        python-distro \
+        python2-jsonschema \
         python2-psutil \
         python-requests \
-        python2-jsonschema \
+        pyodbc \
+    && \
+    yum install -y \
         python36 \
         python3-distro \
         python36-jsonschema \
         python36-psutil \
         python36-requests \
-        openssl-devel \
-        lsof \
-        postgresql-server \
-        unixODBC-devel \
-        pyodbc \
     && \
     yum clean all && \
     rm -rf /var/cache/yum /tmp/*
@@ -45,6 +51,7 @@ RUN yum install -y \
         gcc-c++ \
         make \
         python3-devel \
+        python3-pip \
     && \
     python3 -m pip --no-cache-dir install \
         pyodbc \
