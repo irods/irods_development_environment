@@ -15,6 +15,8 @@ This repository contains tools for the running and troubleshooting of a Docker-c
       1. [`valgrind`](#valgrind)
       1. [`scan-build`](#scan-build)
       1. ( `cppcheck`, ... ?)
+   1. [How to build an iRODS Plugin](#how-to-build-an-irods-plugin)
+   1. [How to build iRODS Externals](#how-to-build-irods-externals)
 ---
 
 ## General Setup
@@ -33,20 +35,22 @@ $ mkdir /full/path/to/irods_build_output_dir
 $ mkdir /full/path/to/icommands_build_output_dir
 $ mkdir /full/path/to/packages_output_dir
 ```
-Note: It may be useful to keep separate build directories across OS flavors and iRODS branches in order to ensure correctness of builds.
+Note: It may be useful to keep separate build directories across OS flavors and git branches in order to ensure correctness of builds.
 
 3. Build the Docker images:
 ```
 $ cd /full/path/to/irods_development_environment_repository_clone
-$ docker build -f irods_core_builder.centos7.Dockerfile -t irods-core-builder-centos7 .
-$ docker build -f irods_core_builder.ubuntu16.Dockerfile -t irods-core-builder-ubuntu16 .
-$ docker build -f irods_core_builder.ubuntu18.Dockerfile -t irods-core-builder-ubuntu18 .
+$ docker build -f irods_core_builder.ubuntu16.Dockerfile -t irods-core-builder-42s:ubuntu-16.04 .
+$ docker build -f irods_core_builder.centos7.Dockerfile -t irods-core-builder-m:centos-7 .
+$ docker build -f irods_core_builder.ubuntu18.Dockerfile -t irods-core-builder-m:ubuntu-18.04 .
 $ docker build -f irods_core_builder.ubuntu20.Dockerfile -t irods-core-builder-m:ubuntu-20.04 .
+$ docker build -f irods_core_builder.almalinux8.Dockerfile -t irods-core-builder-m:almalinux-8 .
 $ docker build -f irods_core_builder.debian11.Dockerfile -t irods-core-builder-m:debian-11 .
 $ docker build -f irods_runner.centos7.Dockerfile -t irods-runner-centos7 .
 $ docker build -f irods_runner.ubuntu16.Dockerfile -t irods-runner-ubuntu16 .
 $ docker build -f irods_runner.ubuntu18.Dockerfile -t irods-runner-ubuntu18 .
 ```
+The Docker Image tags shown above for the builders include the purpose of the image (irods-core-builder) and the branch in the name ('m' is for 'main', '42s' is for '4-2-stable', etc.), and the platform/version in the tag. You can tag images however you'd like, this is simply the system that works best for many of the iRODS development team.
 
 ### How to build (e.g. Ubuntu 16)
 1. Run iRODS builder container:
@@ -57,7 +61,7 @@ $ docker run --rm \
              -v /full/path/to/icommands_repository_clone:/icommands_source:ro \
              -v /full/path/to/icommands_build_output_dir:/icommands_build \
              -v /full/path/to/packages_output_dir:/irods_packages \
-             irods-core-builder-ubuntu16
+             irods-core-builder-42s:ubuntu-16.04
 ```
 
 Usage notes (available by running the above docker container with -h):
@@ -279,11 +283,38 @@ The plugin builder functions very similarly to the core builder.
 
 In addition to the build and package volume mounts, there also needs to be a volume mount for iRODS core packages (i.e. irods-dev and irods-runtime) so that the plugin can install dependencies.
 
+iRODS plugins use a special script to build called the "build hook". It has its own system for discovery and installation of packages to which this environment must adhere in order to work. The directory structure for holding your packages might look something like this:
+```bash
+$ ls -l /path/to/built_irods_packages
+total 20
+drwxr-xr-x 2 user user 4096 Jan 20 17:07  centos-7
+drwxr-xr-x 2 user user 4096 Dec 10 15:07  ubuntu-18.04
+```
+In this directory, we expect that `centos-7` contains built `.rpm` files and `ubuntu-18.04` contains built `.deb` files. As mentioned before, the system for the build hook script has its own way of finding packages, and it will not recognize this naming scheme. Therefore, we can make some symbolic links with the appropriate names that point to the location of our packages. Here is the current table of platform names that the build hooks are expecting:
+| Official Docker Image Tag | Build hook expected dir name |
+| ------------------------- | ---------------------------- |
+| `centos:7`                | `Centos linux_7`             |
+| `ubuntu:16.04`            | `Ubuntu_16`                  |
+| `ubuntu:18.04`            | `Ubuntu_18`                  |
+
+At the time of writing, no other platforms are supported.
+
+So, we can satisfy the build hook by creating symlinks like this:
+
+```bash
+$ ls -l /path/to/built_irods_packages
+total 20
+drwxr-xr-x 2 user user 4096 Jan 20 17:07  centos-7
+lrwxrwxrwx 1 user user    8 Mar 14 16:36 'Centos linux_7' -> centos-7
+lrwxrwxrwx 1 user user   12 Mar 14 16:35  Ubuntu_18 -> ubuntu-18.04
+drwxr-xr-x 2 user user 4096 Dec 10 15:07  ubuntu-18.04
+```
+
 Build the plugin builder like this (use whatever image tag that you wish):
 ```bash
-docker build -f plugin_builder.ubuntu16.Dockerfile -t irods-plugin-builder:ubuntu-16.04 .
-docker build -f plugin_builder.ubuntu18.Dockerfile -t irods-plugin-builder:ubuntu-18.04 .
-docker build -f plugin_builder.centos7.Dockerfile -t irods-plugin-builder:centos-7 .
+docker build -f plugin_builder.ubuntu16.Dockerfile -t irods-plugin-builder-42s:ubuntu-16.04 .
+docker build -f plugin_builder.ubuntu18.Dockerfile -t irods-plugin-builder-42s:ubuntu-18.04 .
+docker build -f plugin_builder.centos7.Dockerfile -t irods-plugin-builder-42s:centos-7 .
 ```
 
 And run the plugin builder like this, e.g. ubuntu:16.04:
@@ -292,9 +323,12 @@ docker run --rm \
            -v /full/path/to/irods_plugin_repository_clone:/irods_plugin_source \
            -v /full/path/to/plugin_build_output_dir:/irods_plugin_build \
            -v /full/path/to/plugin_packages_output_dir:/irods_plugin_packages \
-           -v /full/path/to/built_irods_packages_dir:/irods_packages \
-           irods-plugin-builder:ubuntu-16.04 --build_directory /irods_plugin_build
+           -v /path/to/built_irods_packages:/irods_packages \
+           irods-plugin-builder-42s:ubuntu-16.04 --build_directory /irods_plugin_build
 ```
+NOTE: `/path/to/built_irods_packages` should point to the directory containing the different directories for packages of the various platforms AND the symlinks to said directories, if you have been following the pattern described above.
+
+Another thing to keep in mind: the test hook for iRODS plugins also uses the same directory naming scheme when attempting to discover built plugin packages for testing. You may wish to consider using a directory structure similar to the built iRODS packages as described above for the output directory of your built plugin packages so that the built and test hooks can work in tandem.
 
 ## How to Build iRODS externals
 
