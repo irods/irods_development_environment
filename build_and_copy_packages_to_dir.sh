@@ -131,9 +131,9 @@ echo "========================================="
 
 # Install packages for building iCommands
 if [ "${file_extension}" == "rpm" ] ; then
-    install_packages /irods_packages/irods-{runtime,devel}*."${file_extension}"
+    install_packages /irods_build/irods-{runtime,devel}*."${file_extension}"
 else
-    install_packages /irods_packages/irods-{runtime,dev}*."${file_extension}"
+    install_packages /irods_build/irods-{runtime,dev}*."${file_extension}"
 fi
 
 # Build iCommands
