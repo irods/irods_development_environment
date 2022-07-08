@@ -25,9 +25,9 @@ The [irods_testing_environment](https://github.com/irods/irods_testing_environme
 
 1. Create custom paths.
 ```
-$ git clone https://github.com/irods/irods_development_environment /full/path/to/irods_development_environment_repository_clone
-$ git clone --recursive https://github.com/irods/irods /full/path/to/irods_repository_clone
-$ git clone https://github.com/irods/irods_client_icommands /full/path/to/icommands_repository_clone
+$ git clone https://github.com/irods/irods_development_environment.git /full/path/to/irods_development_environment_repository_clone
+$ git clone --recursive https://github.com/irods/irods.git /full/path/to/irods_repository_clone
+$ git clone https://github.com/irods/irods_client_icommands.git /full/path/to/icommands_repository_clone
 ```
 2. Make 3 directories on host machine for docker volume mounts:
 ```
