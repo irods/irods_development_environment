@@ -2,6 +2,8 @@
 
 This repository contains tools for the running and troubleshooting of a Docker-containerized iRODS server.
 
+The [irods_testing_environment](https://github.com/irods/irods_testing_environment) can be used to test the packages produced by this repository.
+
 ## Contents of this Guide
    1. [General Setup](#general-setup)
       1. [Prerequisites](#prerequisites)
