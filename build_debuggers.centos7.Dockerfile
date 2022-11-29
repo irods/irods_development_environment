@@ -1,12 +1,14 @@
+# syntax=docker/dockerfile:1.5
+
 ARG debugger_base=centos:7
 FROM ${debugger_base}
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
 # Make sure we're starting with an up-to-date image
-RUN yum update -y || [ "$?" -eq 100 ] && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum update -y || [ "$?" -eq 100 ] && \
+    rm -rf /tmp/*
 
 ARG parallelism=3
 ARG tools_prefix=/opt/debug_tools
@@ -15,25 +17,26 @@ RUN mkdir -p  ${tools_prefix}
 
 WORKDIR /tmp
 
-RUN yum install -y \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y \
         epel-release \
         centos-release-scl \
     && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
 #--------
 # TODO: Figure out what section these go in
 
-RUN yum install -y \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y \
         sudo \
         wget \
         gcc-c++ \
     && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
-RUN yum install -y \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y \
         python3 \
         ccache \
         cmake \
@@ -51,57 +54,59 @@ RUN yum install -y \
         ncurses-devel \
         which \
     && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
-RUN yum install -y \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y \
         python3-pip \
     && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
-RUN pip3 --no-cache-dir install pexpect
+RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
+    --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
+    pip3 install pexpect
 
 #--------
 # valgrind, gdb
 
-RUN yum install -y devtoolset-11 && \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y devtoolset-11 && \
     echo "#!/bin/sh" > /etc/profile.d/devtoolset-11.sh && \
     echo "" >> /etc/profile.d/devtoolset-11.sh && \
     echo ". /opt/rh/devtoolset-11/enable" >> /etc/profile.d/devtoolset-11.sh && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
 #--------
 # lldb
 
-RUN yum -y install llvm-toolset-7 && \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y llvm-toolset-7 && \
     echo "#!/bin/sh" > /etc/profile.d/llvm-toolset-7.sh && \
     echo "" >> /etc/profile.d/llvm-toolset-7.sh && \
     echo ". /opt/rh/llvm-toolset-7/enable" >> /etc/profile.d/llvm-toolset-7.sh && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
 #--------
 # rr
 
-RUN yum install -y \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y \
         python36-urllib3 \
         binutils \
     && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
 ARG rr_version="5.5.0"
 
-RUN yum localinstall -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum localinstall -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
+    rm -rf /tmp/*
 
 #--------
 # utils
 
-RUN yum install -y \
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y \
         nano \
         vim-enhanced \
         tmux \
@@ -111,5 +116,4 @@ RUN yum install -y \
         less \
         file \
     && \
-    yum clean all && \
-    rm -rf /var/cache/yum /tmp/*
+    rm -rf /tmp/*

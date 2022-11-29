@@ -1,16 +1,22 @@
+# syntax=docker/dockerfile:1.5
+
 ARG debugger_base=debian:11
 FROM ${debugger_base}
 
 SHELL [ "/bin/bash", "-c" ]
-
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Re-enable apt caching for RUN --mount
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
 # Make sure we're starting with an up-to-date image
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get upgrade -y && \
     apt-get autoremove -y --purge && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 # To mark all installed packages as manually installed:
 #apt-mark showauto | xargs -r apt-mark manual
 
@@ -24,26 +30,28 @@ WORKDIR /tmp
 #--------
 # gdb
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         gdb \
         gdbserver \
     && \
     apt-get remove -y python3-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 
 #--------
 # rr
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         python3-urllib3 \
         binutils \
         wget \
     && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 
 ARG rr_version="5.5.0"
 
@@ -54,27 +62,31 @@ RUN wget "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-$
 #--------
 # valgrind
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         valgrind \
     && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 
 #--------
 # lldb
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         lldb \
     && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 
 #--------
 # utils
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         tmux \
         vim \
@@ -83,5 +95,4 @@ RUN apt-get update && \
         coreutils \
         python3-pexpect \
     && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*

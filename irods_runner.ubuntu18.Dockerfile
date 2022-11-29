@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.5
 #
 # iRODS Runner
 #
@@ -5,19 +6,25 @@ ARG runner_base=ubuntu:18.04
 FROM ${runner_base} as irods-runner
 
 SHELL [ "/bin/bash", "-c" ]
-
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Re-enable apt caching for RUN --mount
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
 # Make sure we're starting with an up-to-date image
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get upgrade -y && \
     apt-get autoremove -y --purge && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 # To mark all installed packages as manually installed:
 #apt-mark showauto | xargs -r apt-mark manual
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         apt-transport-https \
         wget \
@@ -43,18 +50,18 @@ RUN apt-get update && \
         odbc-postgresql \
         libjson-perl \
     && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         git \
         vim \
         nano \
         rsyslog \
     && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 
 RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - && \
     echo "deb [arch=amd64] https://packages.irods.org/apt/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/renci-irods.list && \
@@ -62,7 +69,9 @@ RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - 
     echo "deb [arch=amd64] https://core-dev.irods.org/apt/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/renci-irods-core-dev.list
 
 ARG irods_version="4.2.8"
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
         'irods-externals*' \
         irods-runtime=${irods_version} \
@@ -70,10 +79,8 @@ RUN apt-get update && \
         irods-server=${irods_version} \
         irods-database-plugin-postgres=${irods_version} \
     && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    rm -rf /tmp/*
 
-ADD ICAT.sql /
-ADD keep_alive.sh /keep_alive.sh
-RUN chmod +x /keep_alive.sh
+COPY ICAT.sql /
+COPY --chmod=755 keep_alive.sh /keep_alive.sh
 ENTRYPOINT ["/keep_alive.sh"]
