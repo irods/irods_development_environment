@@ -9,6 +9,7 @@ Builds iRODS repository, installs the dev/runtime packages, and then builds iCom
 Available options:
 
     --core-only             Only builds the core
+    -C, --ccache            Enables ccache for rapid subsequent builds
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
     -N, --ninja             Use ninja builder as the make tool
@@ -71,6 +72,11 @@ debug_config="-DCMAKE_BUILD_TYPE=Release"
 unit_test_config="-DIRODS_UNIT_TESTS_BUILD=YES"
 custom_externals=""
 
+common_cmake_args=(
+    -DCMAKE_COLOR_MAKEFILE=ON
+    -DCMAKE_VERBOSE_MAKEFILE=ON
+)
+
 while [ -n "$1" ] ; do
     case "$1" in
         --core-only)             core_only=1;;
@@ -78,17 +84,13 @@ while [ -n "$1" ] ; do
                                  make_program="ninja";;
         -j|--jobs)               shift; build_jobs=$(($1 + 0));;
         -d|--debug)              debug_config="-DCMAKE_BUILD_TYPE=Debug";;
+        -C|--ccache)             common_cmake_args+=(-DCMAKE_CXX_COMPILER_LAUNCHER=ccache);;
         --exclude-unit-tests)    unit_test_config="-DIRODS_UNIT_TESTS_BUILD=NO";;
         --custom-externals)      shift; custom_externals=$1;;
         -h|--help)               usage;;
     esac
     shift
 done
-
-common_cmake_args=(
-    -DCMAKE_COLOR_MAKEFILE=ON
-    -DCMAKE_VERBOSE_MAKEFILE=ON
-)
 
 if [[ ! -z ${custom_externals} ]] ; then
     install_packages "${custom_externals}"/irods-externals-*."${file_extension}"

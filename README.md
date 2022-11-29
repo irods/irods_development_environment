@@ -69,6 +69,7 @@ Builds iRODS repository, installs the dev/runtime packages, and then builds iCom
 Available options:
 
     --core-only             Only builds the core
+    -C, --ccache            Enables ccache for rapid subsequent builds
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
     -N, --ninja             Use ninja builder as the make tool
@@ -77,6 +78,14 @@ Available options:
     -h, --help              This message
 ```
 The `--custom-externals` option allows you to specify a location in the builder container where there are built iRODS externals. This is useful if the platform does not have built externals available in the RENCI repositories or when trying out a modification to the externals. To do this, use a volume mount when running the docker container and specify the mount name with this option (i.e. the path inside the container).
+
+The `--ccache` option allows you to utilize `ccache` in the build process, speeding up subsequent builds of icommands and the iRODS server. Using this option requires the use of an additional volume mount to the `/irods_build_cache` directory, an abbreviated example is as follows:
+```
+$ docker run --rm \
+             ...  \
+             -v /full/path/to/build_cache_dir:/irods_build_cache \
+             irods-core-builder-ubuntu16 --ccache
+```
 
 ### How to run (e.g. Ubuntu 16)
 1. Run iRODS Runner container:

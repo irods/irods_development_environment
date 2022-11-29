@@ -16,6 +16,7 @@ RUN yum install -y \
 
 # python 2 and 3 must be installed separately because yum will ignore/discard python2
 RUN yum install -y \
+        ccache \
         openssl \
         openssl-devel \
         super \
@@ -124,6 +125,7 @@ ENV PATH=${clang_path}:$PATH
 
 ENV file_extension="rpm"
 ENV package_manager="yum"
+ENV CCACHE_DIR="/irods_build_cache"
 
 COPY build_and_copy_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_packages_to_dir.sh
