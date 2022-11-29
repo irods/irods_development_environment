@@ -15,6 +15,7 @@ RUN dnf install -y \
     rm -rf /var/cache/dnf /var/cache/yum /tmp/*
 
 RUN dnf install -y \
+        ccache \
         python3-devel \
         python3-distro \
         python3-jsonschema \
@@ -105,6 +106,7 @@ ENV PATH=${cmake_path}:$PATH
 
 ENV file_extension="rpm"
 ENV package_manager="dnf"
+ENV CCACHE_DIR="/irods_build_cache"
 
 COPY build_and_copy_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_packages_to_dir.sh

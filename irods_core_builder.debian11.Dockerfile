@@ -16,6 +16,7 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install -y \
         apt-transport-https \
+        ccache \
         g++-10 \
         gcc \
         gcc-10 \
@@ -76,6 +77,7 @@ ENV PATH ${cmake_path}:$PATH
 
 ENV file_extension "deb"
 ENV package_manager "apt-get"
+ENV CCACHE_DIR="/irods_build_cache"
 
 COPY build_and_copy_packages_to_dir.sh /
 RUN chmod u+x /build_and_copy_packages_to_dir.sh
