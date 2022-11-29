@@ -158,20 +158,20 @@ else
     build_dir=$(dirname "$0")
     cd "$build_dir" || { echo >&2 "cannot cd to docker build environment"; exit 2; }
     if [ -e "${DEBUGGER_DOCKERFILE}" ]; then
-        docker build --build-arg debugger_base=${base_image}  -f "${DEBUGGER_DOCKERFILE}" -t "${DEBUGGER_IMAGE}" . ${NO_CACHE}
+        DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg debugger_base=${base_image}  -f "${DEBUGGER_DOCKERFILE}" -t "${DEBUGGER_IMAGE}" . ${NO_CACHE}
         RUNNER_BASE="${DEBUGGER_IMAGE}"
     else
         RUNNER_BASE="${base_image}"
     fi
     if [ -n "$builder_build" ] || [ -n "$do_source_build" ]; then
-        docker build -t "${BUILDER_IMAGE}" -f "${BUILDER_DOCKERFILE}" . ${NO_CACHE}
+        DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -t "${BUILDER_IMAGE}" -f "${BUILDER_DOCKERFILE}" . ${NO_CACHE}
     fi
     if [ -n "$do_source_build" ]; then
         docker run --rm "${vol_mounts[@]}" -it -e "TERM=$TERM" "${BUILDER_IMAGE}" ${do_source_build:1} ${BUILD_OPTIONS}
     fi
     if [ -e "${RUNNER_DOCKERFILE}" ]; then
         if [ -n "$runner_build" ]; then
-            docker build --build-arg runner_base="${RUNNER_BASE}" -t "${RUNNER_IMAGE}" -f "${RUNNER_DOCKERFILE}" . ${NO_CACHE}
+            DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build --build-arg runner_base="${RUNNER_BASE}" -t "${RUNNER_IMAGE}" -f "${RUNNER_DOCKERFILE}" . ${NO_CACHE}
         fi
         if [ -n "$runner_run" ]; then
             echo -n "$((RUNNER_INT+1))" > "${RUNNER_INT_FILE}"

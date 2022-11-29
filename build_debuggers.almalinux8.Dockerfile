@@ -1,13 +1,15 @@
-ARG debugger_base=almalinux:8
+# syntax=docker/dockerfile:1.5
 
+ARG debugger_base=almalinux:8
 FROM ${debugger_base}
 
 SHELL [ "/usr/bin/bash", "-c" ]
 
 # Make sure we're starting with an up-to-date image
-RUN dnf update -y || [ "$?" -eq 100 ] && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf update -y || [ "$?" -eq 100 ] && \
+    rm -rf /tmp/*
 
 ARG parallelism=3
 ARG tools_prefix=/opt/debug_tools
@@ -19,40 +21,46 @@ WORKDIR /tmp
 #--------
 # valgrind, gdb
 
-RUN dnf install -y gcc-toolset-11 && \
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y gcc-toolset-11 && \
     echo "#!/bin/sh" > /etc/profile.d/gcc-toolset-11.sh && \
     echo "" >> /etc/profile.d/gcc-toolset-11.sh && \
     echo ". /opt/rh/gcc-toolset-11/enable" >> /etc/profile.d/gcc-toolset-11.sh && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
 #--------
 # lldb
 
-RUN dnf install -y lldb && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y lldb && \
+    rm -rf /tmp/*
 
 #--------
 # rr
 
-RUN dnf install -y \
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
         python3-urllib3 \
         binutils \
     && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
 ARG rr_version="5.5.0"
 
-RUN dnf install -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
+    rm -rf /tmp/*
 
 #--------
 # utils
 
-RUN dnf install -y \
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
         sudo \
         nano \
         vim-enhanced \
@@ -61,5 +69,4 @@ RUN dnf install -y \
         which \
         file \
     && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+    rm -rf /tmp/*

@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.5
 #
 # iRODS Runner
 #
@@ -7,19 +8,23 @@ FROM ${runner_base} as irods-runner
 SHELL [ "/bin/bash", "-c" ]
 
 # Make sure we're starting with an up-to-date image
-RUN dnf update -y || [ "$?" -eq 100 ] && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf update -y || [ "$?" -eq 100 ] && \
+    rm -rf /tmp/*
 
-RUN dnf install -y \
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
         epel-release \
         sudo \
         wget \
     && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
-RUN dnf install -y \
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
         rsyslog \
         python3 \
         python3-distro \
@@ -32,10 +37,11 @@ RUN dnf install -y \
         postgresql-server \
         unixODBC \
     && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
-RUN dnf install -y \
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
         dnf-plugin-config-manager \
     && \
     rpm --import https://packages.irods.org/irods-signing-key.asc && \
@@ -44,16 +50,15 @@ RUN dnf install -y \
     rpm --import https://core-dev.irods.org/irods-core-dev-signing-key.asc && \
     dnf config-manager -y --add-repo https://core-dev.irods.org/renci-irods-core-dev.yum.repo && \
     dnf config-manager -y --set-enabled renci-irods-core-dev && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
-RUN dnf install -y \
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
         'irods-externals*' \
     && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf /var/cache/yum /tmp/*
+    rm -rf /tmp/*
 
-ADD ICAT.sql /
-ADD keep_alive.sh /keep_alive.sh
-RUN chmod +x /keep_alive.sh
+COPY ICAT.sql /
+COPY --chmod=755 keep_alive.sh /keep_alive.sh
 ENTRYPOINT ["/keep_alive.sh"]

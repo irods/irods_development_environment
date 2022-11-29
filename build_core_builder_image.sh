@@ -38,4 +38,4 @@ while [ -n "$1" ]; do
     shift
 done
 
-docker build $docker_build_args -f $dockerfile -t $image_name $build_args .
+DOCKER_BUILDKIT=1 docker build $docker_build_args -f $dockerfile -t $image_name $build_args .
