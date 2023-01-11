@@ -74,6 +74,9 @@ Available options:
     -j, --jobs              Number of jobs for make tool
     -N, --ninja             Use ninja builder as the make tool
     --exclude-unit-tests    Indicates that iRODS unit tests should not be built
+    --exclude-microservice-tests
+                            Indicates that iRODS tests implemented as microservices
+                            should not be built
     --custom-externals      Path to custom externals packages received via volume mount
     -h, --help              This message
 ```
