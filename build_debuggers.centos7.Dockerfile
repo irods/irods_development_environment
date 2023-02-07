@@ -96,7 +96,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     && \
     rm -rf /tmp/*
 
-ARG rr_version="5.5.0"
+ARG rr_version="5.6.0"
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum localinstall -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
