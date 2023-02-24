@@ -34,6 +34,7 @@ usage()
     echo "                         : -u => --skip-runner-run"
     echo "                         : -g => --debug-source-build"
     echo "                         : -m => --runner-shm"
+    echo "                         : -c => --ccache"
     echo "                         : -j => --jobs"
     echo "                         : -P => --port"
     exit 127
@@ -58,6 +59,7 @@ while [[ $1 = -* ]]; do
         -n|--no-cache) NO_CACHE="--no-cache";;
         -g|--debug*) do_source_build=".--debug";;
         -N|--ninja) BUILD_OPTIONS+=" --ninja";;
+        -c|--ccache) BUILD_OPTIONS+=" --ccache";;
         -m|--runner-shm) RUNNER_SHM="$2"; shift;;
         -j|--jobs) BUILD_OPTIONS+=" --jobs $2"; shift;;
         -P|--port) DOCKER_OPTIONS+=" -p $2"; shift;;

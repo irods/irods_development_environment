@@ -16,6 +16,7 @@ volumes_ro=(
 )
 
 volumes_rw=(
+    ["/irods_build_cache"]="${DEVROOT}/irods_devenv_ccache"
     ["/irods_packages"]="${DEVROOT}/irods_package_output"
     ["/irods_build"]="${DEVROOT}/irods_build_output"
     ["/icommands_build"]="${DEVROOT}/icommands_build_output"

@@ -131,7 +131,14 @@ ENV PATH=${clang_path}:$PATH
 
 ENV file_extension="rpm"
 ENV package_manager="yum"
+
 ENV CCACHE_DIR="/irods_build_cache"
+# Default to a reasonably large cache size
+ENV CCACHE_MAXSIZE="64G"
+# Allow for a lot of files (1.5M files, 300 per directory)
+ENV CCACHE_NLEVELS="3"
+# Allow any uid to use cache
+ENV CCACHE_UMASK="000"
 
 COPY --chmod=755 build_and_copy_packages_to_dir.sh /
 ENTRYPOINT ["./build_and_copy_packages_to_dir.sh"]
