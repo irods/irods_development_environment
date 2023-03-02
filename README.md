@@ -141,6 +141,32 @@ root@19b35a476e2d:/# dpkg -i /irods_packages/irods-{package_name(s)}.deb
 
 It is encouraged to build your own wrapper script with your commonly used volume mounts to make this process easier.
 
+### How to set up debugging (e.g. Ubuntu 20)
+1. Build the debugger image:
+```bash
+# Build the debugger image. This can be tagged however you like.
+export debugger_image_tag=irods-debugger:ubuntu-20.04
+docker build -f build_debuggers.ubuntu20.Dockerfile -t ${debugger_image_tag} .
+```
+
+2. Run the debugger image. It is run with the interactive and tty options enabled and `bash` in order to keep the container alive. The scary security options are required to give the debuggers kernel access, so if this concerns you, consider not running a debugger inside a container. The volume mounts give debuggers the source code information.
+```bash
+export irods_source_dir=/full/path/to/irods_repository_clone
+export irods_build_dir=/full/path/to/irods_build_output_dir
+export icommands_source_dir=/full/path/to/icommands_repository_clone
+export icommands_build_dir=/full/path/to/icommands_build_output_dir
+docker run -i -t \
+    --cap-add=SYS_PTRACE \
+    --security-opt seccomp=unconfined \
+    --privileged \
+    -v "${irods_source_dir}":/irods_source:ro \
+    -v "${irods_build_dir}":/irods_build \
+    -v "${icommands_source_dir}":/icommands_source:ro \
+    -v "${icommands_build_dir}":/icommands_build \
+    "${debugger_image_tag}" bash
+```
+Once the shell has been attached, you are responsible for installing the iRODS packages, setting up the database and the server, and starting the log service (4.3.0+). Packages need to be built with debugging symbols enabled (CMake option `-DCMAKE_BUILD_TYPE=Debug`) in order for the debugging tools to be of use. See [Debugging](#debugging) for instructions on what to do from here.
+
 ---
 
 ## Simplified Setup
