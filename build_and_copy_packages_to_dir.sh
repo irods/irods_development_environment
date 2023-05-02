@@ -87,7 +87,7 @@ while [ -n "$1" ] ; do
         -N|--ninja)                   make_program_config="-GNinja";
                                       make_program="ninja";;
         -j|--jobs)                    shift; build_jobs=$(($1 + 0));;
-        -d|--debug)                   debug_config="-DCMAKE_BUILD_TYPE=Debug";;
+        -d|--debug)                   debug_config="-DCMAKE_BUILD_TYPE=Debug -DCPACK_DEBIAN_COMPRESSION_TYPE=none";;
         -C|--ccache)                  common_cmake_args+=(-DCMAKE_CXX_COMPILER_LAUNCHER=ccache);;
         --exclude-unit-tests)         unit_test_config="-DIRODS_UNIT_TESTS_BUILD=NO";;
         --exclude-microservice-tests) msi_test_config="-DIRODS_MICROSERVICE_TEST_PLUGINS_BUILD=NO";;
