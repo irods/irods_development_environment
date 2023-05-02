@@ -125,16 +125,16 @@ if [[ ${core_only} -gt 0 ]] ; then
     exit
 fi
 
-echo "========================================="
-echo "beginning build of iCommands"
-echo "========================================="
-
-# Install packages for building iCommands
+# Install packages for building other components
 if [ "${file_extension}" == "rpm" ] ; then
     install_packages /irods_build/irods-{runtime,devel}*."${file_extension}"
 else
     install_packages /irods_build/irods-{runtime,dev}*."${file_extension}"
 fi
+
+echo "========================================="
+echo "beginning build of iCommands"
+echo "========================================="
 
 # Build iCommands
 mkdir -p /icommands_build && cd /icommands_build
