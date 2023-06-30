@@ -21,12 +21,13 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     && \
     rm -rf /tmp/*
 
+ARG externals_repo="https://github.com/irods/externals"
 ARG externals_branch="main"
 
 WORKDIR /externals
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
-    git clone https://github.com/irods/externals -b "${externals_branch}" /externals && \
+    git clone "${externals_repo}" -b "${externals_branch}" /externals && \
     ./install_prerequisites.py && \
     rm -rf /externals /tmp/*
 
