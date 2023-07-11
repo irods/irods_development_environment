@@ -116,6 +116,21 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rm -rf /tmp/*
 
 #--------
+# xmlrunner
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    apt-get install -y \
+        python3-pip \
+    && \
+    rm -rf /tmp/*
+
+RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
+    --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
+    pip3 install xmlrunner
+
+#--------
 # utils
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
