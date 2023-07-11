@@ -66,8 +66,7 @@ while [[ $1 = -* ]]; do
     shift
 done
 
-declare -A Os_Map=( ['ubuntu16']='ubuntu:16.04'
-                    ['ubuntu18']='ubuntu:18.04'
+declare -A Os_Map=( ['ubuntu18']='ubuntu:18.04'
                     ['ubuntu20']='ubuntu:20.04'
                     ['debian11']='debian:11'
                     ['almalinux8']='almalinux:8'

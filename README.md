@@ -7,9 +7,9 @@ The [irods_testing_environment](https://github.com/irods/irods_testing_environme
 ## Contents of this Guide
    1. [General Setup](#general-setup)
       1. [Prerequisites](#prerequisites)
-      1. [How to Build](#how-to-build-eg-ubuntu-16)
-      1. [How to Run](#how-to-run-eg-ubuntu-16)
-      1. [How to Develop](#how-to-develop-eg-ubuntu-16)
+      1. [How to Build](#how-to-build-eg-ubuntu-20)
+      1. [How to Run](#how-to-run-eg-ubuntu-20)
+      1. [How to Develop](#how-to-develop-eg-ubuntu-20)
    1. [Simplified Setup](#simplified-setup)
    1. [Debugging](#debugging)
       1. [`gdb`](#gdb)
@@ -41,16 +41,15 @@ Note: It may be useful to keep separate build directories across OS flavors and 
 ```
 $ cd /full/path/to/irods_development_environment_repository_clone
 $ docker build -f irods_core_builder.centos7.Dockerfile -t irods-core-builder-centos7 .
-$ docker build -f irods_core_builder.ubuntu16.Dockerfile -t irods-core-builder-ubuntu16 .
 $ docker build -f irods_core_builder.ubuntu18.Dockerfile -t irods-core-builder-ubuntu18 .
 $ docker build -f irods_core_builder.ubuntu20.Dockerfile -t irods-core-builder-m:ubuntu-20.04 .
 $ docker build -f irods_core_builder.debian11.Dockerfile -t irods-core-builder-m:debian-11 .
 $ docker build -f irods_runner.centos7.Dockerfile -t irods-runner-centos7 .
-$ docker build -f irods_runner.ubuntu16.Dockerfile -t irods-runner-ubuntu16 .
 $ docker build -f irods_runner.ubuntu18.Dockerfile -t irods-runner-ubuntu18 .
+$ docker build -f irods_runner.ubuntu20.Dockerfile -t irods-runner-ubuntu20 .
 ```
 
-### How to build (e.g. Ubuntu 16)
+### How to build (e.g. Ubuntu 20)
 1. Run iRODS builder container:
 ```
 $ docker run --rm \
@@ -59,7 +58,7 @@ $ docker run --rm \
              -v /full/path/to/icommands_repository_clone:/icommands_source:ro \
              -v /full/path/to/icommands_build_output_dir:/icommands_build \
              -v /full/path/to/packages_output_dir:/irods_packages \
-             irods-core-builder-ubuntu16
+             irods-core-builder-ubuntu20
 ```
 
 Usage notes (available by running the above docker container with -h):
@@ -87,24 +86,24 @@ The `--ccache` option allows you to utilize `ccache` in the build process, speed
 $ docker run --rm \
              ...  \
              -v /full/path/to/build_cache_dir:/irods_build_cache \
-             irods-core-builder-ubuntu16 --ccache
+             irods-core-builder-ubuntu20 --ccache
 ```
 
-### How to run (e.g. Ubuntu 16)
+### How to run (e.g. Ubuntu 20)
 1. Run iRODS Runner container:
 ```
-$ docker run -d --name irods-runner-ubuntu16_whatever \
+$ docker run -d --name irods-runner-ubuntu20_whatever \
              -v /full/path/to/packages_output_dir:/irods_packages:ro \
-             irods-runner-ubuntu16
+             irods-runner-ubuntu20
 ```
 2. Open a shell inside the running container:
 ```
-$ docker exec -it irods-runner-ubuntu16_whatever /bin/bash
+$ docker exec -it irods-runner-ubuntu20_whatever /bin/bash
 ```
 Note: iRODS and iCommands are not installed out of the box, nor is the ICAT database prepared.
 The usual steps of an initial iRODS installation must be followed on first-time installation.
 
-### How to develop (e.g. Ubuntu 16)
+### How to develop (e.g. Ubuntu 20)
 1. Edit iRODS/iCommands source files...
 2. Build iRODS and iCommands (see "How to build")
 3. Install packages of interest on iRODS Runner (inside iRODS Runner container):
@@ -163,7 +162,7 @@ $ ./run_debugger.sh -d .. -V volumes.include.sh --debug
 7. Notes
   - When rebuilding, esp for another platform (-p), it may be necessary to clear the binary output directories
     ```
-      $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu16.4-2-stable  # (optionally preserve previous work)
+      $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu20.4-2-stable  # (optionally preserve previous work)
       $ sudo rm -fr ~/dev_root/*_output/* ~/dev_root/*_output/.ninja*
     ```
 
@@ -295,19 +294,19 @@ In addition to the build and package volume mounts, there also needs to be a vol
 
 Build the plugin builder like this (use whatever image tag that you wish):
 ```bash
-docker build -f plugin_builder.ubuntu16.Dockerfile -t irods-plugin-builder:ubuntu-16.04 .
 docker build -f plugin_builder.ubuntu18.Dockerfile -t irods-plugin-builder:ubuntu-18.04 .
+docker build -f plugin_builder.ubuntu20.Dockerfile -t irods-plugin-builder:ubuntu-20.04 .
 docker build -f plugin_builder.centos7.Dockerfile -t irods-plugin-builder:centos-7 .
 ```
 
-And run the plugin builder like this, e.g. ubuntu:16.04:
+And run the plugin builder like this, e.g. ubuntu:20.04:
 ```bash
 docker run --rm \
            -v /full/path/to/irods_plugin_repository_clone:/irods_plugin_source \
            -v /full/path/to/plugin_build_output_dir:/irods_plugin_build \
            -v /full/path/to/plugin_packages_output_dir:/irods_plugin_packages \
            -v /full/path/to/built_irods_packages_dir:/irods_packages \
-           irods-plugin-builder:ubuntu-16.04 --build_directory /irods_plugin_build
+           irods-plugin-builder:ubuntu-20.04 --build_directory /irods_plugin_build
 ```
 
 ## How to Build iRODS externals
