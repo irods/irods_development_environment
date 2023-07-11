@@ -96,5 +96,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         tig \
         coreutils \
         python3-pexpect \
+        iproute2 \
     && \
     rm -rf /tmp/*

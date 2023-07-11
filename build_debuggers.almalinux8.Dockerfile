@@ -68,5 +68,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         lsof \
         which \
         file \
+        iproute \
     && \
     rm -rf /tmp/*
