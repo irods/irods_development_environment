@@ -126,5 +126,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         vim \
         nano \
         tig \
+        iproute2 \
     && \
     rm -rf /tmp/*

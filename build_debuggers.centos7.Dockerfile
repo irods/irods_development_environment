@@ -115,5 +115,6 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         which \
         less \
         file \
+        iproute \
     && \
     rm -rf /tmp/*
