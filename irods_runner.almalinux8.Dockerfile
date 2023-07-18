@@ -39,6 +39,18 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     && \
     rm -rf /tmp/*
 
+# irodsauthuser required for some tests
+# UID and GID ranges picked to hopefully not overlap with anything
+RUN useradd \
+        --key UID_MIN=40000 \
+        --key UID_MAX=50000 \
+        --key GID_MIN=40000 \
+        --key GID_MAX=50000 \
+        --create-home \
+        --shell /bin/bash \
+        irodsauthuser && \
+    echo 'irodsauthuser:;=iamnotasecret' | chpasswd
+
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
