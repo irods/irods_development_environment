@@ -47,6 +47,17 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && \
     rm -rf /tmp/*
 
+# install and configure rsyslog
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    apt-get install -y \
+        rsyslog \
+    && \
+    rm -rf /tmp/*
+COPY irods.rsyslog /etc/rsyslog.d/00-irods.conf
+COPY irods.logrotate /etc/logrotate.d/irods
+
 # irodsauthuser required for some tests
 # UID and GID ranges picked to hopefully not overlap with anything
 RUN useradd \
@@ -66,7 +77,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         git \
         vim \
         nano \
-        rsyslog \
     && \
     rm -rf /tmp/*
 

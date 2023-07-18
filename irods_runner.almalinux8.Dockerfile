@@ -25,7 +25,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
-        rsyslog \
         python3 \
         python3-distro \
         python3-jsonschema \
@@ -38,6 +37,27 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         unixODBC \
     && \
     rm -rf /tmp/*
+
+# install and configure rsyslog
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
+        rsyslog \
+    && \
+    sed -i \
+        -e 's/^\(module(load="imuxsock"\)\s*/\1) /' \
+        -e '/^\s\+SysSock.Use="off")/d' \
+        -e '/^\s\+# local messages/d' \
+        /etc/rsyslog.conf \
+    && \
+    sed -i \
+        -e 's/^\(module(load="imjournal"\)\s*/\1) /' \
+        -e '/^\s\+StateFile=/d' \
+        /etc/rsyslog.conf \
+    && \
+    rm -rf /tmp/*
+COPY irods.rsyslog /etc/rsyslog.d/00-irods.conf
+COPY irods.logrotate /etc/logrotate.d/irods
 
 # irodsauthuser required for some tests
 # UID and GID ranges picked to hopefully not overlap with anything

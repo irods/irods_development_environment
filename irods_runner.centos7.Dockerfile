@@ -23,7 +23,6 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 # python 2 and 3 must be installed separately because yum will ignore/discard python2
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
-        rsyslog \
         openssl-devel \
         lsof \
         postgresql-server \
@@ -61,6 +60,16 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         pyodbc \
     && \
     rm -rf /tmp/*
+
+# install and configure rsyslog
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y \
+        rsyslog \
+    && \
+    sed -i -e 's/\$ModLoad\s\+\([a-z]\+\)/module(load="\1")/' /etc/rsyslog.conf && \
+    rm -rf /tmp/*
+COPY irods.rsyslog /etc/rsyslog.d/00-irods.conf
+COPY irods.logrotate /etc/logrotate.d/irods
 
 # irodsauthuser required for some tests
 # UID and GID ranges picked to hopefully not overlap with anything
