@@ -62,6 +62,18 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     && \
     rm -rf /tmp/*
 
+# irodsauthuser required for some tests
+# UID and GID ranges picked to hopefully not overlap with anything
+RUN useradd \
+        --key UID_MIN=40050 \
+        --key UID_MAX=49000 \
+        --key GID_MIN=40050 \
+        --key GID_MAX=49000 \
+        --create-home \
+        --shell /bin/bash \
+        irodsauthuser && \
+    echo 'irodsauthuser:;=iamnotasecret' | chpasswd
+
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     rpm --import https://packages.irods.org/irods-signing-key.asc && \
     wget -qO - https://packages.irods.org/renci-irods.yum.repo | sudo tee /etc/yum.repos.d/renci-irods.yum.repo && \
