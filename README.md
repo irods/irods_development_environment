@@ -162,7 +162,7 @@ $ ./run_debugger.sh -d .. -V volumes.include.sh --debug
 7. Notes
   - When rebuilding, esp for another platform (-p), it may be necessary to clear the binary output directories
     ```
-      $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu20.4-2-stable  # (optionally preserve previous work)
+      $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu20.4-3-stable  # (optionally preserve previous work)
       $ sudo rm -fr ~/dev_root/*_output/* ~/dev_root/*_output/.ninja*
     ```
 
