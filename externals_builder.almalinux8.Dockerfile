@@ -27,8 +27,6 @@ WORKDIR /externals
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     git clone https://github.com/irods/externals -b "${externals_branch}" /externals && \
-    python3 -m venv build_env && \
-    source build_env/bin/activate && \
     ./install_prerequisites.py && \
     rm -rf /externals /tmp/*
 
