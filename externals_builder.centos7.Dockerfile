@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         sudo \
         git \
         python3 \
-        python3-distro \
+        python36-distro \
         devtoolset-10-gcc \
         devtoolset-10-gcc-c++ \
     && \
