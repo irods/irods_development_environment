@@ -67,7 +67,12 @@ Builds iRODS repository, installs the dev/runtime packages, and then builds iCom
 
 Available options:
 
-    --core-only             Only builds the core
+    --core-only             Only builds the iRODS packages
+    --icommands-only        Only builds the iCommands packages
+    --irods-repo-url        Git URL to remote iRODS repository to clone and build
+    --irods-repo-branch     iRODS repository branch to checkout
+    --icommands-repo-branch iCommands repository branch to checkout
+    --icommands-repo-url    Git URL to remote iCommands repository to clone and build
     -C, --ccache            Enables ccache for rapid subsequent builds
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
@@ -87,6 +92,27 @@ $ docker run --rm \
              ...  \
              -v /full/path/to/build_cache_dir:/irods_build_cache \
              irods-core-builder-ubuntu20 --ccache
+```
+
+Using `--icommands-only` will invalidate `--core-only` and any options which affect iRODS core builds.
+
+If you wish to build a remote repository, you can omit the volume mounts for the iRODS and iCommands repos and instead use `--irods-repo-url`/`--irods-repo-branch` and `--icommands-repo-url`/`--icommands-repo-branch`. The specified repository and branch will be cloned into the container and that code will be built. Here's an example of the usage:
+```bash
+# Note the lack of volume mounts for iRODS and iCommands repos.
+docker run --rm \
+           -v /full/path/to/irods_build_output_dir:/irods_build \
+           -v /full/path/to/icommands_build_output_dir:/icommands_build \
+           -v /full/path/to/packages_output_dir:/irods_packages \
+           irods-core-builder-ubuntu20 \
+           --irods-repo-url https://github.com/my-cool-username/irods \
+           --irods-repo-branch my-wonderful-changes
+```
+
+If no volume mount is provided for the iRODS (or iCommands) repository and `--irods-repo-url` (or `--icommands-repo-url`) is also not provided, [https://github.com/irods/irods](https://github.com/irods/irods) will be cloned and checked out on the `main` branch and packages will be built from that.
+
+For completeness, it should be noted that host-side build caches are not necessary to maintain, either. Therefore, here is the minimal line for running the builder:
+```bash
+docker run -v /full/path/to/packages_output_dir:/irods_packages irods-core-builder-ubuntu20
 ```
 
 ### How to run (e.g. Ubuntu 20)

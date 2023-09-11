@@ -8,7 +8,12 @@ Builds iRODS repository, installs the dev/runtime packages, and then builds iCom
 
 Available options:
 
-    --core-only             Only builds the core
+    --core-only             Only builds the iRODS packages
+    --icommands-only        Only builds the iCommands packages
+    --irods-repo-url        Git URL to remote iRODS repository to clone and build
+    --irods-repo-branch     iRODS repository branch to checkout
+    --icommands-repo-branch iCommands repository branch to checkout
+    --icommands-repo-url    Git URL to remote iCommands repository to clone and build
     -C, --ccache            Enables ccache for rapid subsequent builds
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
@@ -68,6 +73,11 @@ install_packages() {
 }
 
 core_only=0
+icommands_only=0
+irods_repo_url="https://github.com/irods/irods"
+irods_repo_branch="main"
+icommands_repo_url="https://github.com/irods/irods_client_icommands"
+icommands_repo_branch="main"
 make_program="make"
 make_program_config=""
 build_jobs=0
@@ -84,6 +94,11 @@ common_cmake_args=(
 while [ -n "$1" ] ; do
     case "$1" in
         --core-only)                  core_only=1;;
+        --icommands-only)             icommands_only=1;;
+        --irods-repo-url)             irods_repo_url="$1";;
+        --irods-repo-branch)          irods_repo_branch="$1";;
+        --icommands-repo-url)         icommands_repo_url="$1";;
+        --icommands-repo-branch)      icommands_repo_branch="$1";;
         -N|--ninja)                   make_program_config="-GNinja";
                                       make_program="ninja";;
         -j|--jobs)                    shift; build_jobs=$(($1 + 0));;
@@ -103,26 +118,34 @@ fi
 
 build_jobs=$(( !build_jobs ? $(nproc) - 1 : build_jobs )) #prevent maxing out CPUs
 
-echo "========================================="
-echo "beginning build of iRODS server"
-echo "========================================="
+# skip building iRODS packages if --icommands-only was used
+if [[ ${icommands_only} -eq 0 ]] ; then
+    if [[ ! -d /irods_source ]] ; then
+        # If the source directory does not exist, we clone one from a remote source.
+        git clone "${irods_repo_url}" /irods_source -b "${irods_repo_branch}" --recurse-submodules
+    fi
 
-# Build iRODS
-mkdir -p /irods_build && cd /irods_build
-cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} /irods_source
-if [[ -z ${build_jobs} ]] ; then
-    ${make_program} package
-else
-    echo "using [${build_jobs}] threads"
-    ${make_program} -j ${build_jobs} package
-fi
+    echo "========================================="
+    echo "beginning build of iRODS server"
+    echo "========================================="
 
-# Copy packages to mounts
-cp -r /irods_build/*."${file_extension}" /irods_packages/
+    # Build iRODS
+    mkdir -p /irods_build && cd /irods_build
+    cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} /irods_source
+    if [[ -z ${build_jobs} ]] ; then
+        ${make_program} package
+    else
+        echo "using [${build_jobs}] threads"
+        ${make_program} -j ${build_jobs} package
+    fi
 
-# stop if --core-only option was used
-if [[ ${core_only} -gt 0 ]] ; then
-    exit
+    # Copy packages to mounts
+    cp -r /irods_build/*."${file_extension}" /irods_packages/
+
+    # stop if --core-only option was used
+    if [[ ${core_only} -gt 0 ]] ; then
+        exit
+    fi
 fi
 
 # Install packages for building other components
@@ -135,6 +158,11 @@ fi
 echo "========================================="
 echo "beginning build of iCommands"
 echo "========================================="
+
+if [[ ! -d /icommands_source ]] ; then
+    # If the source directory does not exist, we clone one from a remote source.
+    git clone "${icommands_repo_url}" /icommands_source -b "${icommands_repo_branch}" --recurse-submodules
+fi
 
 # Build iCommands
 mkdir -p /icommands_build && cd /icommands_build
