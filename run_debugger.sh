@@ -70,6 +70,7 @@ done
 
 declare -A Os_Map=( ['ubuntu18']='ubuntu:18.04'
                     ['ubuntu20']='ubuntu:20.04'
+                    ['ubuntu22']='ubuntu:22.04'
                     ['debian11']='debian:11'
                     ['debian12']='debian:12'
                     ['almalinux8']='almalinux:8'
