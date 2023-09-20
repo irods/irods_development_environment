@@ -11,9 +11,9 @@ Available options:
     --core-only             Only builds the iRODS packages
     --icommands-only        Only builds the iCommands packages
     --irods-repo-url        Git URL to remote iRODS repository to clone and build
-    --irods-repo-branch     iRODS repository branch to checkout
-    --icommands-repo-branch iCommands repository branch to checkout
+    --irods-commitish       Commit-ish (sha, branch, tag, etc.) to checkout in iRODS
     --icommands-repo-url    Git URL to remote iCommands repository to clone and build
+    --icommands-commitish   Commit-ish (sha, branch, tag, etc.) to checkout in iCommands
     -C, --ccache            Enables ccache for rapid subsequent builds
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
@@ -75,9 +75,9 @@ install_packages() {
 core_only=0
 icommands_only=0
 irods_repo_url="https://github.com/irods/irods"
-irods_repo_branch="main"
+irods_commitish="main"
 icommands_repo_url="https://github.com/irods/irods_client_icommands"
-icommands_repo_branch="main"
+icommands_commitish="main"
 make_program="make"
 make_program_config=""
 build_jobs=0
@@ -95,10 +95,10 @@ while [ -n "$1" ] ; do
     case "$1" in
         --core-only)                  core_only=1;;
         --icommands-only)             icommands_only=1;;
-        --irods-repo-url)             irods_repo_url="$1";;
-        --irods-repo-branch)          irods_repo_branch="$1";;
-        --icommands-repo-url)         icommands_repo_url="$1";;
-        --icommands-repo-branch)      icommands_repo_branch="$1";;
+        --irods-repo-url)             shift; irods_repo_url="$1";;
+        --irods-commitish)            shift; irods_commitish="$1";;
+        --icommands-repo-url)         shift; icommands_repo_url="$1";;
+        --icommands-commitish)        shift; icommands_commitish="$1";;
         -N|--ninja)                   make_program_config="-GNinja";
                                       make_program="ninja";;
         -j|--jobs)                    shift; build_jobs=$(($1 + 0));;
@@ -122,7 +122,8 @@ build_jobs=$(( !build_jobs ? $(nproc) - 1 : build_jobs )) #prevent maxing out CP
 if [[ ${icommands_only} -eq 0 ]] ; then
     if [[ ! -d /irods_source ]] ; then
         # If the source directory does not exist, we clone one from a remote source.
-        git clone "${irods_repo_url}" /irods_source -b "${irods_repo_branch}" --recurse-submodules
+        git clone "${irods_repo_url}" /irods_source --recurse-submodules
+        cd /irods_source && git checkout "${irods_commitish}" && cd -
     fi
 
     echo "========================================="
@@ -161,7 +162,8 @@ echo "========================================="
 
 if [[ ! -d /icommands_source ]] ; then
     # If the source directory does not exist, we clone one from a remote source.
-    git clone "${icommands_repo_url}" /icommands_source -b "${icommands_repo_branch}" --recurse-submodules
+    git clone "${icommands_repo_url}" /icommands_source --recurse-submodules
+    cd /irods_source && git checkout "${icommands_commitish}" && cd -
 fi
 
 # Build iCommands
