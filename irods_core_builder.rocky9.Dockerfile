@@ -22,19 +22,22 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
         ccache \
+        lsof \
+        openssl \
+        openssl-devel \
+        postgresql-server \
         python3-devel \
         python3-distro \
         python3-jsonschema \
         python3-psutil \
         python3-pyodbc \
         python3-requests \
-        openssl \
-        openssl-devel \
-        lsof \
-        postgresql-server \
         which \
     && \
     rm -rf /tmp/*
+
+# TODO: irods/irods#7349 - Remove this line once iRODS repository signing keys have been updated.
+RUN update-crypto-policies --set LEGACY
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
@@ -66,20 +69,21 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm && \
     dnf config-manager --set-enabled crb && \
     dnf install -y \
-        git \
-        pam-devel \
-        fuse-devel \
-        libcurl-devel \
         bzip2-devel \
-        libxml2-devel \
-        make \
+        fuse-devel \
         gcc \
         gcc-c++ \
+        git \
+        help2man \
+        krb5-devel \
+        libcurl-devel \
+        libxml2-devel \
+        make \
+        ninja-build \
+        pam-devel \
+        python3-packaging \
         rpm-build \
         sudo \
-        ninja-build \
-        help2man \
-        python3-packaging \
         unixODBC-devel \
     && \
     rm -rf /tmp/*
