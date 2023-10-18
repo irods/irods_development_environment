@@ -30,6 +30,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         libxml2-dev \
         lsb-release \
         python3 \
+        python3-packaging \
         python3-pip \
         python3-setuptools \
         sudo \

@@ -31,6 +31,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         lsb-release \
         python3 \
         python3-distro \
+        python3-packaging \
         python3-pip \
         python3-setuptools \
         sudo \

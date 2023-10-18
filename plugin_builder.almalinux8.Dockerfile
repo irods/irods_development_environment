@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
+        dnf-plugins-core \
         epel-release \
         sudo \
         wget \
@@ -20,17 +21,17 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         rpm-build \
         gcc-c++ \
     && \
+    dnf config-manager --set-enabled powertools && \
     rm -rf /tmp/*
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
-        dnf-plugins-core \
         python3 \
         python3-devel \
+        python3-packaging \
         python3-pip \
     && \
-    dnf config-manager --set-enabled powertools && \
     rm -rf /tmp/*
 
 # TODO: python3 is the only option at this time, so we don't really need this

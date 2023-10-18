@@ -19,6 +19,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         git \
         python3 \
         python36-distro \
+        python36-packaging \
         devtoolset-10-gcc \
         devtoolset-10-gcc-c++ \
     && \
