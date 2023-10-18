@@ -27,6 +27,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         git \
         python3 \
         python3-distro \
+        python3-packaging \
     && \
     rm -rf /tmp/*
 
