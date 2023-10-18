@@ -27,6 +27,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf install -y \
         python3 \
         python3-devel \
+        python3-distro \
         python3-pip \
     && \
     rm -rf /tmp/*
