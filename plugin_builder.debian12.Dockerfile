@@ -25,6 +25,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get install --no-install-recommends -y \
         apt-utils \
         build-essential \
+        cmake \
         git \
         gnupg \
         libxml2-dev \
