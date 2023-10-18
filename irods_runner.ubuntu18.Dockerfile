@@ -32,11 +32,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         sudo \
         gnupg \
         rsyslog \
-        python \
-        python-psutil \
-        python-requests \
-        python-jsonschema \
-        python-distro \
         python3 \
         python3-psutil \
         python3-requests \

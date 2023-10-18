@@ -20,21 +20,12 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     && \
     rm -rf /tmp/*
 
-# python 2 and 3 must be installed separately because yum will ignore/discard python2
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
         openssl-devel \
         lsof \
         postgresql-server \
         unixODBC-devel \
-    && \
-    yum install -y \
-        python \
-        python-distro \
-        python2-jsonschema \
-        python2-psutil \
-        python-requests \
-        pyodbc \
     && \
     yum install -y \
         python36 \

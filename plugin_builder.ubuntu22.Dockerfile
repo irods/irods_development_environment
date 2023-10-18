@@ -21,8 +21,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     apt-get update && \
     apt-get install --no-install-recommends -y \
         apt-utils \
@@ -38,7 +36,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         sudo \
         wget \
     && \
-    pip install --upgrade 'pip<21.0' && \
     rm -rf /tmp/*
 
 ENV python="python3"

@@ -24,15 +24,12 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
-    --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     dnf install -y \
         dnf-plugins-core \
         python3 \
         python3-devel \
         python3-pip \
     && \
-    python3 -m pip install --upgrade 'pip<21.0' && \
     dnf config-manager --set-enabled powertools && \
     rm -rf /tmp/*
 
