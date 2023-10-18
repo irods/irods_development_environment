@@ -25,6 +25,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get install -y \
         apt-transport-https \
         ccache \
+        cmake \
         g++-12 \
         gcc \
         gcc-12 \
@@ -88,9 +89,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN update-alternatives --install /usr/local/bin/gcc gcc /usr/bin/gcc-12 1 && \
     update-alternatives --install /usr/local/bin/g++ g++ /usr/bin/g++-12 1 && \
     hash -r
-
-ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
-ENV PATH ${cmake_path}:$PATH
 
 ENV file_extension "deb"
 ENV package_manager "apt-get"

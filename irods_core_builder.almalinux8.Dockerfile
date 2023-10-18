@@ -22,6 +22,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
         ccache \
+        cmake \
         python3-devel \
         python3-distro \
         python3-jsonschema \

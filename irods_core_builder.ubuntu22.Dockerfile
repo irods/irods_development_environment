@@ -27,6 +27,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get install -y \
         apt-transport-https \
         ccache \
+        cmake \
         g++-11 \
         gcc \
         gcc-11 \
