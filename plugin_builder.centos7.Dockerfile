@@ -19,21 +19,12 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     && \
     rm -rf /tmp/*
 
-# python 2 and 3 must be installed separately because yum will ignore/discard python2
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
-    --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     yum install -y \
         python3 \
         python3-devel \
         python3-pip \
     && \
-    yum install -y \
-        python \
-        python-devel \
-        python-pip \
-    && \
-    pip install --upgrade 'pip<21.0' && \
     rm -rf /tmp/*
 
 ENV python="python3"

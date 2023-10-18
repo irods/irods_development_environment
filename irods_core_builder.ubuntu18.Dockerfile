@@ -21,8 +21,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     apt-get update && \
     apt-get install -y \
         apt-transport-https \
@@ -45,15 +43,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         ninja-build \
         odbc-postgresql \
         postgresql \
-        python \
-        python-dev \
-        python-pip \
-        python-distro \
-        python-jsonschema \
-        python-packaging \
-        python-psutil \
-        python-pyodbc \
-        python-requests \
         python3 \
         python3-pip \
         python3-distro \
@@ -68,7 +57,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         wget \
         zlib1g-dev \
     && \
-    pip install --upgrade 'pip<21.0' && \
     rm -rf /tmp/*
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \

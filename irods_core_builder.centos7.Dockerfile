@@ -16,10 +16,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     && \
     rm -rf /tmp/*
 
-# python 2 and 3 must be installed separately because yum will ignore/discard python2
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
-    --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     yum install -y \
         ccache \
         openssl \
@@ -31,17 +28,6 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         libjson-perl \
     && \
     yum install -y \
-        python \
-        python-devel \
-        python-distro \
-        python2-packaging \
-        python2-pip \
-        python2-jsonschema \
-        python2-psutil \
-        python-requests \
-        pyodbc \
-    && \
-    yum install -y \
         python36 \
         python3-devel \
         python3-distro \
@@ -51,7 +37,6 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         python36-psutil \
         python36-requests \
     && \
-    pip install --upgrade 'pip<21.0' && \
     rm -rf /tmp/*
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
