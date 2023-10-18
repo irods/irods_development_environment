@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
+        dnf-plugins-core \
         epel-release \
         sudo \
         wget \
@@ -20,6 +21,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         rpm-build \
         gcc-c++ \
     && \
+    dnf config-manager --set-enabled crb && \
     rm -rf /tmp/*
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
