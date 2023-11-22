@@ -24,6 +24,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         python3 \
         python3-devel \
         python3-pip \
+        python36-distro \
         python36-packaging \
     && \
     rm -rf /tmp/*
