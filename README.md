@@ -41,11 +41,9 @@ Note: It may be useful to keep separate build directories across OS flavors and 
 ```
 $ cd /full/path/to/irods_development_environment_repository_clone
 $ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.centos7.Dockerfile -t irods-core-builder-centos7 .
-$ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.ubuntu18.Dockerfile -t irods-core-builder-ubuntu18 .
 $ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.ubuntu20.Dockerfile -t irods-core-builder-m:ubuntu-20.04 .
 $ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.debian11.Dockerfile -t irods-core-builder-m:debian-11 .
 $ DOCKER_BUILDKIT=1 docker build -f irods_runner.centos7.Dockerfile -t irods-runner-centos7 .
-$ DOCKER_BUILDKIT=1 docker build -f irods_runner.ubuntu18.Dockerfile -t irods-runner-ubuntu18 .
 $ DOCKER_BUILDKIT=1 docker build -f irods_runner.ubuntu20.Dockerfile -t irods-runner-ubuntu20 .
 ```
 
@@ -346,7 +344,6 @@ In addition to the build and package volume mounts, there also needs to be a vol
 
 Build the plugin builder like this (use whatever image tag that you wish):
 ```bash
-DOCKER_BUILDKIT=1 docker build -f plugin_builder.ubuntu18.Dockerfile -t irods-plugin-builder:ubuntu-18.04 .
 DOCKER_BUILDKIT=1 docker build -f plugin_builder.ubuntu20.Dockerfile -t irods-plugin-builder:ubuntu-20.04 .
 DOCKER_BUILDKIT=1 docker build -f plugin_builder.centos7.Dockerfile -t irods-plugin-builder:centos-7 .
 ```

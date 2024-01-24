@@ -6,7 +6,7 @@ do_source_build="."
 builder_build="y"
 runner_build="y"
 runner_run="y"
-OS_NAME="ubuntu18"
+OS_NAME="ubuntu22"
 DEVROOT=""
 NO_CACHE=""
 BUILD_OPTIONS=""
@@ -68,8 +68,7 @@ while [[ $1 = -* ]]; do
     shift
 done
 
-declare -A Os_Map=( ['ubuntu18']='ubuntu:18.04'
-                    ['ubuntu20']='ubuntu:20.04'
+declare -A Os_Map=( ['ubuntu20']='ubuntu:20.04'
                     ['ubuntu22']='ubuntu:22.04'
                     ['debian11']='debian:11'
                     ['debian12']='debian:12'
