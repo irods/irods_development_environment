@@ -27,7 +27,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         python3 \
         python3-distro \
         python3-packaging \
-        gcc-toolset-12 \
     && \
     rm -rf /tmp/*
 
@@ -40,16 +39,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     git clone "${externals_repo}" -b "${externals_branch}" /externals && \
     ./install_prerequisites.py && \
     rm -rf /externals /tmp/*
-
-# TODO: The following will enable the newer toolchain on interactive shell logins. The
-# externals builder, however, is not an interactive shell, so this does not execute. This seems
-# like a much better option than explicitly setting the PATH environment variable to check for
-# new thing, as is being done below. Investigate making this effective for this builder.
-#RUN echo "#!/bin/sh" > /etc/profile.d/gcc-toolset-12.sh && \
-#    echo "" >> /etc/profile.d/gcc-toolset-12.sh && \
-#    echo ". /opt/rh/gcc-toolset-12/enable" >> /etc/profile.d/gcc-toolset-12.sh
-
-ENV PATH=/opt/rh/gcc-toolset-12/root/usr/bin:$PATH
 
 ENV file_extension="rpm"
 ENV package_manager="dnf"
