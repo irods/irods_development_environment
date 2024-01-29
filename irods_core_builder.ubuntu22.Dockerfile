@@ -28,9 +28,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         apt-transport-https \
         ccache \
         cmake \
-        g++-11 \
+        g++ \
         gcc \
-        gcc-11 \
         git \
         gnupg \
         help2man \
@@ -78,10 +77,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         'irods-externals*' \
     && \
     rm -rf /tmp/*
-
-RUN update-alternatives --install /usr/local/bin/gcc gcc /usr/bin/gcc-11 1 && \
-    update-alternatives --install /usr/local/bin/g++ g++ /usr/bin/g++-11 1 && \
-    hash -r
 
 ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
 ENV PATH=${cmake_path}:$PATH

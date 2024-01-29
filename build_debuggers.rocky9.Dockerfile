@@ -19,14 +19,22 @@ RUN mkdir -p  ${tools_prefix}
 WORKDIR /tmp
 
 #--------
-# valgrind, gdb
+# valgrind
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
-    dnf install -y gcc-toolset-12 && \
-    echo "#!/bin/sh" > /etc/profile.d/gcc-toolset-12.sh && \
-    echo "" >> /etc/profile.d/gcc-toolset-12.sh && \
-    echo ". /opt/rh/gcc-toolset-12/enable" >> /etc/profile.d/gcc-toolset-12.sh && \
+    dnf install -y valgrind && \
+    rm -rf /tmp/*
+
+#--------
+# gdb
+
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    dnf install -y \
+        gdb \
+        gdb-gdbserver \
+    && \
     rm -rf /tmp/*
 
 #--------

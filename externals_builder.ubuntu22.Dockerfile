@@ -42,10 +42,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     ./install_prerequisites.py && \
     rm -rf /externals /tmp/*
 
-RUN update-alternatives --install /usr/local/bin/gcc gcc /usr/bin/gcc-11 1 && \
-    update-alternatives --install /usr/local/bin/g++ g++ /usr/bin/g++-11 1 && \
-    hash -r
-
 ENV file_extension="deb"
 ENV package_manager="apt-get"
 
