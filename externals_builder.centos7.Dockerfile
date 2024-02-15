@@ -43,6 +43,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 #    echo ". /opt/rh/devtoolset-10/enable" >> /etc/profile.d/devtoolset-10.sh
 
 ENV PATH=/opt/rh/devtoolset-10/root/usr/bin:$PATH
+ENV IRODS_EXTERNALS_GCC_PREFIX=/opt/rh/devtoolset-10/root/usr
 
 ENV file_extension="rpm"
 ENV package_manager="yum"

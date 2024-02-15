@@ -10,6 +10,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
+        centos-release-scl \
         epel-release \
         sudo \
         wget \

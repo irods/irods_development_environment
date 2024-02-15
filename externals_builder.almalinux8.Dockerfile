@@ -50,6 +50,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
 #    echo ". /opt/rh/gcc-toolset-11/enable" >> /etc/profile.d/gcc-toolset-11.sh
 
 ENV PATH=/opt/rh/gcc-toolset-11/root/usr/bin:$PATH
+ENV IRODS_EXTERNALS_GCC_PREFIX=/opt/rh/gcc-toolset-11/root/usr
 
 ENV file_extension="rpm"
 ENV package_manager="dnf"
