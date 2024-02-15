@@ -11,6 +11,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
+        centos-release-scl \
         epel-release \
         wget \
     && \
@@ -73,6 +74,8 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         help2man \
         rpm-build \
         sudo \
+        devtoolset-10-gcc \
+        devtoolset-10-gcc-c++ \
     && \
     rm -rf /tmp/*
 
@@ -83,17 +86,13 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
         cmake3 \
         spdlog-devel \
-        centos-release-scl \
-    && \
-    yum install -y \
-        devtoolset-11 \
     && \
     python3 -m pip install \
         pyodbc \
     && \
     mkdir /tmp/cmake3-bin && \
     ln -s /usr/bin/cmake3 /tmp/cmake3-bin/cmake && \
-    source /opt/rh/devtoolset-11/enable && \
+    source /opt/rh/devtoolset-10/enable && \
     PATH=/tmp/cmake3-bin:$PATH python3 -m pip install \
         lief \
             --global-option="--lief-no-cache" \

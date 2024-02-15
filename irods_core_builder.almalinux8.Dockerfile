@@ -86,6 +86,9 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         ninja-build \
         help2man \
         python3-packaging \
+        gcc-toolset-11-gcc \
+        gcc-toolset-11-gcc-c++ \
+        gcc-toolset-11-libstdc++-devel \
     && \
     rm -rf /tmp/*
 

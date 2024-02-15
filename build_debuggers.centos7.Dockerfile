@@ -67,16 +67,6 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     pip3 install pexpect
 
 #--------
-# valgrind, gdb
-
-RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
-    yum install -y devtoolset-11 && \
-    echo "#!/bin/sh" > /etc/profile.d/devtoolset-11.sh && \
-    echo "" >> /etc/profile.d/devtoolset-11.sh && \
-    echo ". /opt/rh/devtoolset-11/enable" >> /etc/profile.d/devtoolset-11.sh && \
-    rm -rf /tmp/*
-
-#--------
 # lldb
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
@@ -85,6 +75,20 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     echo "" >> /etc/profile.d/llvm-toolset-7.sh && \
     echo ". /opt/rh/llvm-toolset-7/enable" >> /etc/profile.d/llvm-toolset-7.sh && \
     rm -rf /tmp/*
+
+ENV PATH=/opt/rh/llvm-toolset-7/root/usr/bin:$PATH
+
+#--------
+# valgrind, gdb
+
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    yum install -y devtoolset-10 && \
+    echo "#!/bin/sh" > /etc/profile.d/devtoolset-10.sh && \
+    echo "" >> /etc/profile.d/devtoolset-10.sh && \
+    echo ". /opt/rh/devtoolset-10/enable" >> /etc/profile.d/devtoolset-10.sh && \
+    rm -rf /tmp/*
+
+ENV PATH=/opt/rh/devtoolset-10/root/usr/bin:$PATH
 
 #--------
 # rr
