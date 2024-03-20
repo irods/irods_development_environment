@@ -62,6 +62,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         unixodbc-dev \
         wget \
         zlib1g-dev \
+        flex \
+        bison \
     && \
     pip3 install lief && \
     rm -rf /tmp/*

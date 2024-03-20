@@ -89,6 +89,8 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         gcc-toolset-11-gcc \
         gcc-toolset-11-gcc-c++ \
         gcc-toolset-11-libstdc++-devel \
+        flex \
+        bison \
     && \
     rm -rf /tmp/*
 

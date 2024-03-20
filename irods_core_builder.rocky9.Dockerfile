@@ -86,6 +86,8 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         rpm-build \
         sudo \
         unixODBC-devel \
+        flex \
+        bison \
     && \
     rm -rf /tmp/*
 
