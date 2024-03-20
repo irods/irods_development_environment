@@ -17,6 +17,12 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     && \
     rm -rf /tmp/*
 
+# CERT LIFTeR - for newer flex and bison
+RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    rpm --import https://www.cert.org/forensics/repository/forensics-expires-2022-04-03.asc && \
+    yum install -y https://forensics.cert.org/cert-forensics-tools-release-el7.rpm && \
+    rm -rf /tmp/*
+
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
         ccache \
@@ -76,6 +82,8 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         sudo \
         devtoolset-10-gcc \
         devtoolset-10-gcc-c++ \
+        flex \
+        bison \
     && \
     rm -rf /tmp/*
 
