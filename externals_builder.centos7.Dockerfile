@@ -11,7 +11,6 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
-        centos-release-scl \
         epel-release \
     && \
     yum install -y \
@@ -20,8 +19,6 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         python3 \
         python36-distro \
         python36-packaging \
-        devtoolset-10-gcc \
-        devtoolset-10-gcc-c++ \
     && \
     rm -rf /tmp/*
 
