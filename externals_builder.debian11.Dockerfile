@@ -24,7 +24,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
     apt-get install -y \
         sudo \
-        cmake \
         git \
         python3 \
         python3-distro \
