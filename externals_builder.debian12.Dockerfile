@@ -28,6 +28,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         python3 \
         python3-distro \
         python3-packaging \
+        python3-setuptools \
     && \
     rm -rf /tmp/*
 
