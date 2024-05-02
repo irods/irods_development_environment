@@ -22,7 +22,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
         sudo \
-        cmake \
         git \
         python3 \
         python3-distro \
