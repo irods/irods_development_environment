@@ -44,15 +44,8 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf install -y \
         rsyslog \
     && \
-    sed -i \
-        -e 's/^\(module(load="imuxsock"\)\s*/\1) /' \
-        -e '/^\s\+SysSock.Use="off")/d' \
-        -e '/^\s\+# local messages/d' \
-        /etc/rsyslog.conf \
-    && \
-    sed -i \
-        -e 's/^\(module(load="imjournal"\)\s*/\1) /' \
-        -e '/^\s\+StateFile=/d' \
+    sed -i -E \
+        -e 's/SysSock\.Use\s*=\s*"?off"?/SysSock.Use="on"/' \
         /etc/rsyslog.conf \
     && \
     rm -rf /tmp/*
