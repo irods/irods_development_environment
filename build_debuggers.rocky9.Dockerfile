@@ -53,14 +53,28 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf install -y \
         python3-urllib3 \
         binutils \
+        epel-release \
     && \
     rm -rf /tmp/*
 
-ARG rr_version="5.6.0"
+# The rr package from github is built for EL8.
+# Due to package dependencies, it can't be installed on EL9.
+# The package from Fedora 38 is very close. We can use it if we update libstdc++ and glibc.
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
-    dnf install -y "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.rpm" && \
+    dnf install -y \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-2.37-19.fc38.x86_64.rpm" \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-2.37-19.fc38.i686.rpm" \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-common-2.37-19.fc38.x86_64.rpm" \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-minimal-langpack-2.37-19.fc38.x86_64.rpm" \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-devel-2.37-19.fc38.x86_64.rpm" \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-headers-x86-2.37-19.fc38.noarch.rpm" \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/l/libstdc++-13.2.1-7.fc38.x86_64.rpm" \
+    && \
+    dnf install -y \
+        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/r/rr-5.7.0-9.fc38.x86_64.rpm" \
+    && \
     rm -rf /tmp/*
 
 #--------
