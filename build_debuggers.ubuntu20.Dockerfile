@@ -89,14 +89,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
-    apt-get install -y \
+    apt-get install --no-install-recommends -y \
         python3-pip \
+        python3-lxml \
     && \
     rm -rf /tmp/*
 
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
-    pip3 install xmlrunner
+    pip3 install \
+        unittest-xml-reporting \
+    && \
+    rm -rf /tmp/*
 
 #--------
 # utils

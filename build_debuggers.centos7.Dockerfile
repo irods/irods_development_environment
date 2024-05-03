@@ -113,13 +113,14 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     yum install -y \
         python3-pip \
+        python3-lxml \
     && \
     rm -rf /tmp/*
 
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     python3 -m pip install \
-        xmlrunner \
+        unittest-xml-reporting \
     && \
     rm -rf /tmp/*
 
