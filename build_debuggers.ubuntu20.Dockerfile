@@ -53,7 +53,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && \
     rm -rf /tmp/*
 
-ARG rr_version="5.6.0"
+ARG rr_version="5.7.0"
 
 RUN wget "https://github.com/rr-debugger/rr/releases/download/${rr_version}/rr-${rr_version}-Linux-x86_64.deb" && \
     dpkg -i "rr-${rr_version}-Linux-x86_64.deb" && \

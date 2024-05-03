@@ -45,10 +45,11 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf install -y \
         python3-urllib3 \
         binutils \
+        epel-release \
     && \
     rm -rf /tmp/*
 
-ARG rr_version="5.6.0"
+ARG rr_version="5.7.0"
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
