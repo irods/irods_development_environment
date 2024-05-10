@@ -53,20 +53,12 @@ fi
 
 install_packages() {
     if [ "${package_manager}" == "apt-get" ] ; then
-        apt-get update
-        dpkg -i "$@" || true
-        apt-get install -fy --allow-downgrades
-        for pkg_file in "$@" ; do
-            pkg_name="$(dpkg-deb --field "${pkg_file}" Package)"
-            pkg_arch="$(dpkg-deb --field "${pkg_file}" Architecture)"
-            pkg_vers="$(dpkg-deb --field "${pkg_file}" Version)"
-
-            pkg_vers_inst="$(dpkg-query  --showformat='${Version}' --show "${pkg_name}:${pkg_arch}")" ||
-                (echo "could not verify installation of ${pkg_file}" && exit 1)
-            if [ "${pkg_vers}" == "${pkg_vers_inst}" ] ; then
-                echo "installed version of ${pkg_name}:${pkg_arch} does not match ${pkg_file}"
-            fi
+        pkg_files=()
+        for pkg_file in "$@"; do
+            pkg_files+=("$(realpath "${pkg_file}")")
         done
+        apt-get update
+        apt-get install -y --allow-downgrades "${pkg_files[@]}"
     elif [ "${package_manager}" == "yum" ] ; then
         yum install -y "$@"
     elif [ "${package_manager}" == "dnf" ] ; then
