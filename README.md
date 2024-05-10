@@ -132,7 +132,7 @@ The usual steps of an initial iRODS installation must be followed on first-time 
 2. Build iRODS and iCommands (see "How to build")
 3. Install packages of interest on iRODS Runner (inside iRODS Runner container):
 ```
-root@19b35a476e2d:/# dpkg -i /irods_packages/irods-{package_name(s)}.deb
+root@19b35a476e2d:/# apt-get update; apt-get install -y /irods_packages/irods-{package_name(s)}.deb
 ```
 4. Test your changes
 5. Rinse and repeat
