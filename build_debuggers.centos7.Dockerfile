@@ -7,6 +7,11 @@ SHELL [ "/usr/bin/bash", "-c" ]
 
 # Make sure we're starting with an up-to-date image
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
+    sed -i \
+        -e 's/mirror.centos.org/vault.centos.org/g' \
+        -e 's/^#.*baseurl=http/baseurl=http/g' \
+        -e 's/^mirrorlist=http/#mirrorlist=http/g' \
+        /etc/yum.repos.d/*.repo && \
     yum update -y || [ "$?" -eq 100 ] && \
     rm -rf /tmp/*
 
@@ -22,6 +27,11 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
         epel-release \
         centos-release-scl \
     && \
+    sed -i \
+        -e 's/mirror.centos.org/vault.centos.org/g' \
+        -e 's/^#.*baseurl=http/baseurl=http/g' \
+        -e 's/^mirrorlist=http/#mirrorlist=http/g' \
+        /etc/yum.repos.d/*.repo && \
     rm -rf /tmp/*
 
 #--------
