@@ -64,16 +64,16 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/var/cache/yum,sharing=locked \
     dnf install -y \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-2.37-19.fc38.x86_64.rpm" \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-2.37-19.fc38.i686.rpm" \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-common-2.37-19.fc38.x86_64.rpm" \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-minimal-langpack-2.37-19.fc38.x86_64.rpm" \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-devel-2.37-19.fc38.x86_64.rpm" \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-headers-x86-2.37-19.fc38.noarch.rpm" \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/l/libstdc++-13.2.1-7.fc38.x86_64.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-2.37-19.fc38.x86_64.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-2.37-19.fc38.i686.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-common-2.37-19.fc38.x86_64.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-minimal-langpack-2.37-19.fc38.x86_64.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-devel-2.37-19.fc38.x86_64.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/g/glibc-headers-x86-2.37-19.fc38.noarch.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/l/libstdc++-13.2.1-7.fc38.x86_64.rpm" \
     && \
     dnf install -y \
-        "https://dl.fedoraproject.org/pub/fedora/linux/updates/38/Everything/x86_64/Packages/r/rr-5.7.0-9.fc38.x86_64.rpm" \
+        "https://archives.fedoraproject.org/pub/archive/fedora/linux/updates/38/Everything/x86_64/Packages/r/rr-5.7.0-9.fc38.x86_64.rpm" \
     && \
     rm -rf /tmp/*
 
