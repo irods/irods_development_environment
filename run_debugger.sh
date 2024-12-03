@@ -75,7 +75,7 @@ declare -A Os_Map=( ['ubuntu20']='ubuntu:20.04'
                     ['debian12']='debian:12'
                     ['almalinux8']='almalinux:8'
                     ['rocky9']='rockylinux:9'
-                    ['centos7']='centos:7' )
+                  )
 
 base_image=${Os_Map["$OS_NAME"]}
 
