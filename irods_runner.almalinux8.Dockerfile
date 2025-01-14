@@ -84,6 +84,22 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     && \
     rm -rf /tmp/*
 
+# Disable unwanted systemd units, set default target
+RUN find /etc/systemd/system \
+        /lib/systemd/system \
+        \( -path '*.wants/*' -or -path '*.requires/*' -or -path '*.upholds/*' \) \
+        -not -name '*journald*' \
+        -not -name '*dbus*' \
+        -not -name '*rsyslog*' \
+        -not -name '*systemd-journal*' \
+        -not -name '*systemd-tmpfiles*' \
+        -not -name '*systemd-user-sessions*' \
+        -not -name '*systemd-sysext*' \
+        -delete && \
+    rm -rf /usr/lib/systemd/system/timers.target.wants/systemd-tmpfiles-clean.timer && \
+    ln -sf /usr/lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+# Note that the patterns passed to find above are being *excluded* from the delete command
+
 COPY ICAT.sql /
 COPY --chmod=755 keep_alive.sh /keep_alive.sh
 ENTRYPOINT ["/keep_alive.sh"]
