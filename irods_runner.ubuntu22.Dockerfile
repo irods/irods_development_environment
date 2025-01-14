@@ -25,6 +25,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
+    apt-get install --no-install-recommends -y \
+        systemd \
+        dbus-broker \
+        dbus-user-session \
+        libnss-systemd \
+    && \
     apt-get install -y \
         apt-transport-https \
         wget \
@@ -92,6 +98,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         'irods-externals*' \
     && \
     rm -rf /tmp/*
+
+# Disable unwanted systemd units
+RUN find /etc/systemd/system \
+        /lib/systemd/system \
+        \( -path '*.wants/*' -or -path '*.requires/*' -or -path '*.upholds/*' \) \
+        -not -name '*journald*' \
+        -not -name '*dbus*' \
+        -not -name '*rsyslog*' \
+        -not -name '*systemd-journal*' \
+        -not -name '*systemd-tmpfiles*' \
+        -not -name '*systemd-user-sessions*' \
+        -not -name '*systemd-sysext*' \
+        -delete && \
+    rm -rf /lib/systemd/system/timers.target.wants/systemd-tmpfiles-clean.timer
 
 COPY ICAT.sql /
 COPY --chmod=755 keep_alive.sh /keep_alive.sh

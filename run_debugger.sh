@@ -6,6 +6,8 @@ do_source_build="."
 builder_build="y"
 runner_build="y"
 runner_run="y"
+runner_systemd=""
+runner_mount_cgroup=""
 OS_NAME="ubuntu22"
 DEVROOT=""
 NO_CACHE=""
@@ -13,8 +15,9 @@ BUILD_OPTIONS=""
 DOCKER_OPTIONS="
                  -d -i -t "
 RUNNER_SHM="256m"
+RUNNER_ARGS=""
 DEBUG_OPTIONS="
-                 --cap-add=SYS_PTRACE
+                 --cap-add SYS_PTRACE
                  --security-opt seccomp=unconfined
                  --privileged "
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/irods"
@@ -34,6 +37,7 @@ usage()
     echo "                         : -u => --skip-runner-run"
     echo "                         : -g => --debug-source-build"
     echo "                         : -m => --runner-shm"
+    echo "                         : -i => --runner-systemd"
     echo "                         : -c => --ccache"
     echo "                         : -j => --jobs"
     echo "                         : -P => --port"
@@ -61,8 +65,10 @@ while [[ $1 = -* ]]; do
         -N|--ninja) BUILD_OPTIONS+=" --ninja";;
         -c|--ccache) BUILD_OPTIONS+=" --ccache";;
         -m|--runner-shm) RUNNER_SHM="$2"; shift;;
+        -i|--runner-systemd) runner_systemd="y";;
         -j|--jobs) BUILD_OPTIONS+=" --jobs $2"; shift;;
         -P|--port) DOCKER_OPTIONS+=" -p $2"; shift;;
+        --runner-mount-cgroup) runner_mount_cgroup="y";;
         *) usage bad option "'$1'" ;;
     esac
     shift
@@ -139,6 +145,32 @@ while [ "$(docker ps -aq -f name=${RUNNER_NAME})" ]; do
     RUNNER_NAME="irods_runner.${RUNNER_NUMBER}.${OS_NAME}"
 done
 
+if [ -n "$runner_mount_cgroup" ]; then
+    if [ -e "/sys/fs/cgroup/cgroup.controllers" ]; then
+        # cgroups2
+        DOCKER_OPTIONS+=" --cgroupns=host"
+        vol_mounts+=("-v" "/sys/fs/cgroup:/sys/fs/cgroup:rw")
+    else
+        # cgroups1?
+        vol_mounts+=("-v" "/sys/fs/cgroup:/sys/fs/cgroup:ro")
+    fi
+fi
+if [ -n "$runner_systemd" ]; then
+    if [ -z "$runner_mount_cgroup" ]; then
+        DOCKER_OPTIONS+=" --cgroup-parent=docker.slice"
+        DOCKER_OPTIONS+=" --cgroupns=private"
+    fi
+    DOCKER_OPTIONS+=" --cap-add SYS_ADMIN"
+    DOCKER_OPTIONS+=" --tmpfs /tmp"
+    DOCKER_OPTIONS+=" --tmpfs /run"
+    DOCKER_OPTIONS+=" --tmpfs /run/lock"
+    DOCKER_OPTIONS+=" --env container=docker"
+    DOCKER_OPTIONS+=" --workdir /"
+    DOCKER_OPTIONS+=" --entrypoint /lib/systemd/systemd"
+    DOCKER_OPTIONS+=" --stop-signal SIGRTMIN+3"
+    RUNNER_ARGS="log-level=info unit=sysinit.target"
+fi
+
 if [ -n "$dry_run" ]; then  # -- print mount options for the debugger run
     echo "--- using OS_NAME='$OS_NAME' base_image='$base_image' ---"
     if [ -e "${DEBUGGER_DOCKERFILE}" ]; then
@@ -180,7 +212,7 @@ else
         fi
         if [ -n "$runner_run" ]; then
             echo -n "$((RUNNER_INT+1))" > "${RUNNER_INT_FILE}"
-            docker run "${vol_mounts[@]}" ${DOCKER_OPTIONS} ${DEBUG_OPTIONS} --name "${RUNNER_NAME}" "${RUNNER_IMAGE}"
+            docker run "${vol_mounts[@]1}" ${DOCKER_OPTIONS} ${DEBUG_OPTIONS} --name "${RUNNER_NAME}" "${RUNNER_IMAGE}" ${RUNNER_ARGS}
         fi
     fi
 fi
