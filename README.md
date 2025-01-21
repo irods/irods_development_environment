@@ -113,21 +113,55 @@ For completeness, it should be noted that host-side build caches are not necessa
 docker run -v /full/path/to/packages_output_dir:/irods_packages irods-core-builder-ubuntu20
 ```
 
-### How to run (e.g. Ubuntu 20)
+### How to run (e.g. Ubuntu 24)
 1. Run iRODS Runner container:
 ```
-$ docker run -d --name irods-runner-ubuntu20_whatever \
+$ docker run -d --name irods-runner-ubuntu24_whatever \
              -v /full/path/to/packages_output_dir:/irods_packages:ro \
-             irods-runner-ubuntu20
+             irods-runner-ubuntu24
 ```
 2. Open a shell inside the running container:
 ```
-$ docker exec -it irods-runner-ubuntu20_whatever /bin/bash
+$ docker exec -it irods-runner-ubuntu24_whatever /bin/bash
 ```
 Note: iRODS and iCommands are not installed out of the box, nor is the ICAT database prepared.
 The usual steps of an initial iRODS installation must be followed on first-time installation.
 
-### How to develop (e.g. Ubuntu 20)
+#### systemd
+By default, the runner containers do not spin up a service manager; however, systemd is present within the images to facilitate testing iRODS with proper service management. Running systemd inside a container requires an extra step and some additional arguments to `docker run`. There are a few different ways to accomplish this, but we recommend using cgroups2 and a systemd slice.
+
+First, add the following options to `/etc/docker/daemon.json`:
+```json
+{
+    "exec-opts": ["native.cgroupdriver=systemd"],
+    "cgroup-parent": "docker.slice"
+
+}
+```
+
+You may have to restart any running docker/containerd daemons after making this change.
+
+Now, when starting the runner container, you will need some additional arguments:
+```
+$ docker run -d --name irods-runner-ubuntu24_whatever \
+             -v /full/path/to/packages_output_dir:/irods_packages:ro \
+             --privileged \
+             --cap-add SYS_ADMIN \
+             --security-opt seccomp=unconfined \
+             --cgroup-parent=docker.slice \
+             --cgroupns private \
+             --tmpfs /tmp \
+             --tmpfs /run \
+             --tmpfs /run/lock \
+             --env container=docker \
+             --workdir / \
+             --entrypoint /lib/systemd/systemd \
+             --stop-signal SIGRTMIN+3 \
+             irods-runner-ubuntu24 \
+             log-level=info unit=sysinit.target
+```
+
+### How to develop
 1. Edit iRODS/iCommands source files...
 2. Build iRODS and iCommands (see "How to build")
 3. Install packages of interest on iRODS Runner (inside iRODS Runner container):
