@@ -85,6 +85,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         python3-packaging \
         rpm-build \
         sudo \
+        systemd-devel \
         unixODBC-devel \
         flex \
         bison \
