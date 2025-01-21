@@ -83,6 +83,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         gcc-c++ \
         rpm-build \
         sudo \
+        systemd-devel \
         ninja-build \
         help2man \
         python3-packaging \

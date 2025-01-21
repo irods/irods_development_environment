@@ -40,6 +40,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         libkrb5-dev \
         libpam0g-dev \
         libssl-dev \
+        libsystemd-dev \
         libxml2-dev \
         lsb-release \
         lsof \
