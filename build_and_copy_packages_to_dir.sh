@@ -24,6 +24,11 @@ Available options:
                             should not be built
     --enable-address-sanitizer
                             Indicates that Address Sanitizer should be enabled
+    --enable-undefined-behavior-sanitizer
+                            Indicates that Undefined Behavior Sanitizer should be enabled
+    --enable-undefined-behavior-sanitizer-implicit-conversion
+                            Indicates that the implicit conversion check of Undefined
+                            Behavior Sanitizer should be enabled
     --custom-externals      Path to custom externals packages received via volume mount
     -h, --help              This message
 _EOF_
@@ -102,6 +107,8 @@ while [ -n "$1" ] ; do
         --exclude-unit-tests)         unit_test_config="-DIRODS_UNIT_TESTS_BUILD=NO";;
         --exclude-microservice-tests) msi_test_config="-DIRODS_MICROSERVICE_TEST_PLUGINS_BUILD=NO";;
         --enable-address-sanitizer)   enable_asan="-DIRODS_ENABLE_ADDRESS_SANITIZER=YES";;
+        --enable-undefined-behavior-sanitizer)   enable_ubsan="-DIRODS_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER=YES";;
+        --enable-undefined-behavior-sanitizer-implicit-conversion)    enable_ubsan_implicit_conversion="-DIRODS_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER_IMPLICIT_CONVERSION_CHECK=YES";;
         --custom-externals)           shift; custom_externals=$1;;
         -h|--help)                    usage;;
     esac
@@ -128,7 +135,7 @@ if [[ ${icommands_only} -eq 0 ]] ; then
 
     # Build iRODS
     mkdir -p /irods_build && cd /irods_build
-    cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} ${enable_asan} /irods_source
+    cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} ${enable_asan} ${enable_ubsan} ${enable_ubsan_implicit_conversion} /irods_source
     if [[ -z ${build_jobs} ]] ; then
         ${make_program} package
     else
@@ -164,7 +171,7 @@ fi
 
 # Build iCommands
 mkdir -p /icommands_build && cd /icommands_build
-cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${enable_asan} /icommands_source
+cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${enable_asan} ${enable_ubsan} ${enable_ubsan_implicit_conversion} /icommands_source
 if [[ -z ${build_jobs} ]] ; then
     ${make_program} package
 else
