@@ -32,6 +32,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         python3-pyodbc \
         python3-requests \
         openssl \
+        procps \
         lsof \
         postgresql-server \
         unixODBC \
