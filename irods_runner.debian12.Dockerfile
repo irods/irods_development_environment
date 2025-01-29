@@ -37,6 +37,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         lsb-release \
         sudo \
         gnupg \
+        procps \
         rsyslog \
         python3 \
         python3-psutil \
