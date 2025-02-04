@@ -75,6 +75,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         git \
         pam-devel \
         fuse-devel \
+        libarchive-devel \
         libcurl-devel \
         bzip2-devel \
         libxml2-devel \

@@ -77,6 +77,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         git \
         help2man \
         krb5-devel \
+        libarchive-devel \
         libcurl-devel \
         libxml2-devel \
         make \
