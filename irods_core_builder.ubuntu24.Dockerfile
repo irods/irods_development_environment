@@ -31,6 +31,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         git \
         gnupg \
         help2man \
+        libarchive-dev \
         libbz2-dev \
         libcurl4-gnutls-dev \
         libfuse-dev \
