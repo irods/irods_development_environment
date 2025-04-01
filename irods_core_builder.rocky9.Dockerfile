@@ -72,6 +72,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf install -y \
         bzip2-devel \
         catch2-devel \
+        fmt-devel \
         fuse-devel \
         gcc \
         gcc-c++ \
@@ -87,6 +88,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         pam-devel \
         python3-packaging \
         rpm-build \
+        spdlog-devel \
         sudo \
         systemd-devel \
         unixODBC-devel \
@@ -102,7 +104,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     dnf install -y \
         python3-pip \
-        spdlog-devel \
     && \
     python3 -m pip install \
         lief \

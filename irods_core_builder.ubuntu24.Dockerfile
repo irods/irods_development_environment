@@ -35,10 +35,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         libarchive-dev \
         libbz2-dev \
         libcurl4-gnutls-dev \
+        libfmt-dev \
         libfuse-dev \
         libjson-perl \
         libkrb5-dev \
         libpam0g-dev \
+        libspdlog-dev \
         libssl-dev \
         libsystemd-dev \
         libxml2-dev \
