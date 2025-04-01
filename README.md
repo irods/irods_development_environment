@@ -7,9 +7,9 @@ The [irods_testing_environment](https://github.com/irods/irods_testing_environme
 ## Contents of this Guide
    1. [General Setup](#general-setup)
       1. [Prerequisites](#prerequisites)
-      1. [How to Build](#how-to-build-eg-ubuntu-20)
-      1. [How to Run](#how-to-run-eg-ubuntu-20)
-      1. [How to Develop](#how-to-develop-eg-ubuntu-20)
+      1. [How to Build](#how-to-build-eg-ubuntu-24)
+      1. [How to Run](#how-to-run-eg-ubuntu-24)
+      1. [How to Develop](#how-to-develop-eg-ubuntu-24)
    1. [Simplified Setup](#simplified-setup)
    1. [Debugging](#debugging)
       1. [`gdb`](#gdb)
@@ -40,14 +40,14 @@ Note: It may be useful to keep separate build directories across OS flavors and 
 3. Build the Docker images:
 ```
 $ cd /full/path/to/irods_development_environment_repository_clone
-$ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.almalinux8.Dockerfile -t irods-core-builder-almalinux8 .
-$ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.ubuntu20.Dockerfile -t irods-core-builder-m:ubuntu-20.04 .
-$ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.debian11.Dockerfile -t irods-core-builder-m:debian-11 .
-$ DOCKER_BUILDKIT=1 docker build -f irods_runner.almalinux8.Dockerfile -t irods-runner-almalinux8 .
-$ DOCKER_BUILDKIT=1 docker build -f irods_runner.ubuntu20.Dockerfile -t irods-runner-ubuntu20 .
+$ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.rocky9.Dockerfile -t irods-core-builder-rocky9 .
+$ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.ubuntu24.Dockerfile -t irods-core-builder-m:ubuntu-24.04 .
+$ DOCKER_BUILDKIT=1 docker build -f irods_core_builder.debian12.Dockerfile -t irods-core-builder-m:debian-12 .
+$ DOCKER_BUILDKIT=1 docker build -f irods_runner.rocky9.Dockerfile -t irods-runner-rocky9 .
+$ DOCKER_BUILDKIT=1 docker build -f irods_runner.ubuntu24.Dockerfile -t irods-runner-ubuntu24 .
 ```
 
-### How to build (e.g. Ubuntu 20)
+### How to build (e.g. Ubuntu 24)
 1. Run iRODS builder container:
 ```
 $ docker run --rm \
@@ -56,7 +56,7 @@ $ docker run --rm \
              -v /full/path/to/icommands_repository_clone:/icommands_source:ro \
              -v /full/path/to/icommands_build_output_dir:/icommands_build \
              -v /full/path/to/packages_output_dir:/irods_packages \
-             irods-core-builder-ubuntu20
+             irods-core-builder-ubuntu24
 ```
 
 Usage notes (available by running the above docker container with -h):
@@ -89,7 +89,7 @@ The `--ccache` option allows you to utilize `ccache` in the build process, speed
 $ docker run --rm \
              ...  \
              -v /full/path/to/build_cache_dir:/irods_build_cache \
-             irods-core-builder-ubuntu20 --ccache
+             irods-core-builder-ubuntu24 --ccache
 ```
 
 Using `--icommands-only` will invalidate `--core-only` and any options which affect iRODS core builds.
@@ -101,7 +101,7 @@ docker run --rm \
            -v /full/path/to/irods_build_output_dir:/irods_build \
            -v /full/path/to/icommands_build_output_dir:/icommands_build \
            -v /full/path/to/packages_output_dir:/irods_packages \
-           irods-core-builder-ubuntu20 \
+           irods-core-builder-ubuntu24 \
            --irods-repo-url https://github.com/my-cool-username/irods \
            --irods-repo-branch my-wonderful-changes
 ```
@@ -110,7 +110,7 @@ If no volume mount is provided for the iRODS (or iCommands) repository and `--ir
 
 For completeness, it should be noted that host-side build caches are not necessary to maintain, either. Therefore, here is the minimal line for running the builder:
 ```bash
-docker run -v /full/path/to/packages_output_dir:/irods_packages irods-core-builder-ubuntu20
+docker run -v /full/path/to/packages_output_dir:/irods_packages irods-core-builder-ubuntu24
 ```
 
 ### How to run (e.g. Ubuntu 24)
@@ -173,12 +173,12 @@ root@19b35a476e2d:/# apt-get update; apt-get install -y /irods_packages/irods-{p
 
 It is encouraged to build your own wrapper script with your commonly used volume mounts to make this process easier.
 
-### How to set up debugging (e.g. Ubuntu 20)
+### How to set up debugging (e.g. Ubuntu 24)
 1. Build the debugger image:
 ```bash
 # Build the debugger image. This can be tagged however you like.
-export debugger_image_tag=irods-debugger:ubuntu-20.04
-docker build -f build_debuggers.ubuntu20.Dockerfile -t ${debugger_image_tag} .
+export debugger_image_tag=irods-debugger:ubuntu-24.04
+docker build -f build_debuggers.ubuntu24.Dockerfile -t ${debugger_image_tag} .
 ```
 
 2. Run the debugger image. It is run with the interactive and tty options enabled and `bash` in order to keep the container alive. The scary security options are required to give the debuggers kernel access, so if this concerns you, consider not running a debugger inside a container. The volume mounts give debuggers the source code information.
@@ -246,7 +246,7 @@ $ ./run_debugger.sh -d .. -V volumes.include.sh --debug
 7. Notes
   - When rebuilding, esp for another platform (-p), it may be necessary to clear the binary output directories
     ```
-      $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu20.4-3-stable  # (optionally preserve previous work)
+      $ sudo cp -rp  ~/dev_root ~/dev_root.ubuntu24.4-3-stable  # (optionally preserve previous work)
       $ sudo rm -fr ~/dev_root/*_output/* ~/dev_root/*_output/.ninja*
     ```
 
@@ -378,18 +378,18 @@ In addition to the build and package volume mounts, there also needs to be a vol
 
 Build the plugin builder like this (use whatever image tag that you wish):
 ```bash
-DOCKER_BUILDKIT=1 docker build -f plugin_builder.ubuntu20.Dockerfile -t irods-plugin-builder:ubuntu-20.04 .
-DOCKER_BUILDKIT=1 docker build -f plugin_builder.almalinux8.Dockerfile -t irods-plugin-builder:almalinux-8 .
+DOCKER_BUILDKIT=1 docker build -f plugin_builder.ubuntu24.Dockerfile -t irods-plugin-builder:ubuntu-24.04 .
+DOCKER_BUILDKIT=1 docker build -f plugin_builder.rocky9.Dockerfile -t irods-plugin-builder:rocky9 .
 ```
 
-And run the plugin builder like this, e.g. ubuntu:20.04:
+And run the plugin builder like this, e.g. ubuntu:24.04:
 ```bash
 docker run --rm \
            -v /full/path/to/irods_plugin_repository_clone:/irods_plugin_source \
            -v /full/path/to/plugin_build_output_dir:/irods_plugin_build \
            -v /full/path/to/plugin_packages_output_dir:/irods_plugin_packages \
            -v /full/path/to/built_irods_packages_dir:/irods_packages \
-           irods-plugin-builder:ubuntu-20.04 --build_directory /irods_plugin_build
+           irods-plugin-builder:ubuntu-24.04 --build_directory /irods_plugin_build
 ```
 
 ## How to Build iRODS externals
