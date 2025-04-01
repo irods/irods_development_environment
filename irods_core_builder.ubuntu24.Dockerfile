@@ -24,6 +24,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
     apt-get install -y \
         apt-transport-https \
+        catch2 \
         ccache \
         cmake \
         g++ \

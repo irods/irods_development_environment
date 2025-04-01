@@ -71,6 +71,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf config-manager --set-enabled crb && \
     dnf install -y \
         bzip2-devel \
+        catch2-devel \
         fuse-devel \
         gcc \
         gcc-c++ \
