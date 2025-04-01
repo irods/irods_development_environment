@@ -82,9 +82,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && \
     rm -rf /tmp/*
 
-ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
-ENV PATH=${cmake_path}:$PATH
-
 ENV file_extension="deb"
 ENV package_manager="apt-get"
 

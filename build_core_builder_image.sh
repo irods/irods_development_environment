@@ -13,7 +13,6 @@ Example:
 Available options:
 
     --image-tag             Desired tag for the new docker image
-    --cmake-path            Full path to the CMake binary (e.g. /opt/irods-externals/cmakeX.X.X/bin)
     --dockerfile            Dockerfile to build (required)
     --no-cache              Do not use cached images when building
     -h, --help              This message
@@ -30,7 +29,6 @@ dockerfile=
 while [ -n "$1" ]; do
     case "$1" in
         --image-name)       shift; image_name=${1};;
-        --cmake-path)       shift; build_args="$build_args --build-arg cmake_path=${1}";;
         --dockerfile)       shift; dockerfile=${1};;
         --no-cache)         shift; docker_build_args="--no-cache";;
         -h|--help)          usage;;

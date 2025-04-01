@@ -100,7 +100,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/root/.cache/wheel,sharing=locked \
     dnf install -y \
         python3-pip \
-        cmake \
         spdlog-devel \
     && \
     python3 -m pip install \
@@ -116,9 +115,6 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
             --global-option="--lief-no-dex" \
     && \
     rm -rf /tmp/*
-
-ARG cmake_path="/opt/irods-externals/cmake3.21.4-0/bin"
-ENV PATH=${cmake_path}:$PATH
 
 ENV file_extension="rpm"
 ENV package_manager="dnf"
