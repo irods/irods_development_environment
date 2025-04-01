@@ -48,6 +48,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         lsof \
         make \
         ninja-build \
+        nlohmann-json3-dev \
         odbc-postgresql \
         postgresql \
         python3 \
