@@ -352,7 +352,7 @@ The clang static analyzer can be used when building iRODS.
 
    ```
    export PATH=/opt/irods-externals/cmake3.11.4-0/bin:$PATH
-   export PATH=/opt/irods-externals/clang6.0-0/bin:$PATH
+   export PATH=/opt/irods-externals/clang16.0.6-0/bin:$PATH
    export CCC_CC=clang
    export CCC_CXX=clang++
 
