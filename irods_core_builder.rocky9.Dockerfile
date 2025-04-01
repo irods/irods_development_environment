@@ -83,6 +83,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
         libxml2-devel \
         make \
         ninja-build \
+        nlohmann_json-devel \
         pam-devel \
         python3-packaging \
         rpm-build \
