@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.5
 
-ARG debugger_base=rockylinux:9
+ARG debugger_base=rockylinux/rockylinux:9
 FROM ${debugger_base}
 
 SHELL [ "/usr/bin/bash", "-c" ]

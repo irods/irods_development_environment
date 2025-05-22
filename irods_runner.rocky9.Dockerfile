@@ -2,7 +2,7 @@
 #
 # iRODS Runner
 #
-ARG runner_base=rockylinux:9
+ARG runner_base=rockylinux/rockylinux:9
 FROM ${runner_base} as irods-runner
 
 SHELL [ "/bin/bash", "-c" ]
