@@ -199,6 +199,47 @@ docker run -i -t \
 ```
 Once the shell has been attached, you are responsible for installing the iRODS packages, setting up the database and the server, and starting the log service (4.3.0+). Packages need to be built with debugging symbols enabled (CMake option `-DCMAKE_BUILD_TYPE=Debug`) in order for the debugging tools to be of use. See [Debugging](#debugging) for instructions on what to do from here.
 
+### How to run clang-tidy (e.g. Ubuntu 24)
+
+First, build the clang-tidy runner image:
+```bash
+DOCKER_BUILDKIT=1 docker build -f irods_clang_tidy.ubuntu24.Dockerfile -t irods-clang-tidy-m:ubuntu-24.04 .
+```
+
+Run the clang-tidy runner image like this, replacing the volume mount paths as necessary on the host filesystem:
+```bash
+docker run -it --rm \
+    -v /full/path/to/irods_build_output_dir:/irods_build:ro \
+    -v /full/path/to/irods_repository_clone:/irods_source:ro \
+    irods-clang-tidy-m:ubuntu-24.04
+```
+The clang-tidy output will appear in stdout.
+
+By default, the clang-tidy output will show only results from the diff between the commit checked out at `HEAD` and the commit on tip of `main`. In order to target a diff with a different commit or branch or tag, use the `--commitish` option:
+```bash
+docker run -it --rm \
+    -v /full/path/to/irods_build_output_dir:/irods_build:ro \
+    -v /full/path/to/irods_repository_clone:/irods_source:ro \
+    irods-clang-tidy-m:ubuntu-24.04 --commitish 4.3.5
+```
+
+The clang-tidy output will target all files modified in the diff by default. In order to see results from only one specific file, use the `--target-files` option and specify the path relative to the root of the repository:
+```bash
+docker run -it --rm \
+    -v /full/path/to/irods_build_output_dir:/irods_build:ro \
+    -v /full/path/to/irods_repository_clone:/irods_source:ro \
+    irods-clang-tidy-m:ubuntu-24.04 --target-files plugins/database/src/db_plugin.cpp
+```
+
+Any files which appear in the diff under a directory can also be targeted with the `--target-files` option like this:
+```bash
+docker run -it --rm \
+    -v /full/path/to/irods_build_output_dir:/irods_build:ro \
+    -v /full/path/to/irods_repository_clone:/irods_source:ro \
+    irods-clang-tidy-m:ubuntu-24.04 --target-files lib/core/src
+```
+Technically, `--target-files` is just a passthrough to the `<path>` positional argument of `git diff`, so you can treat it just like that.
+
 ---
 
 ## Simplified Setup
