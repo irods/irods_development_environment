@@ -75,10 +75,14 @@ Available options:
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
     -N, --ninja             Use ninja builder as the make tool
-    --exclude-unit-tests    Indicates that iRODS unit tests should not be built
+    --exclude-unit-tests    Indicates that iRODS unit tests should not be built. Not
+                            compatible with --enable-all-tests.
     --exclude-microservice-tests
                             Indicates that iRODS tests implemented as microservices
-                            should not be built
+                            should not be built. Not compatible with --enable-all-tests.
+    --enable-all-tests      Indicates that IRODS_ENABLE_ALL_TESTS CMake option should be
+                            enabled. If specified, all targets used only in testing will
+                            built.
     --custom-externals      Path to custom externals packages received via volume mount
     -h, --help              This message
 ```

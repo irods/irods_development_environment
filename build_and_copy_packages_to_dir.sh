@@ -18,10 +18,14 @@ Available options:
     -d, --debug             Build with symbols for debugging
     -j, --jobs              Number of jobs for make tool
     -N, --ninja             Use ninja builder as the make tool
-    --exclude-unit-tests    Indicates that iRODS unit tests should not be built
+    --exclude-unit-tests    Indicates that iRODS unit tests should not be built. Not
+                            compatible with --enable-all-tests.
     --exclude-microservice-tests
                             Indicates that iRODS tests implemented as microservices
-                            should not be built
+                            should not be built. Not compatible with --enable-all-tests.
+    --enable-all-tests      Indicates that IRODS_ENABLE_ALL_TESTS CMake option should be
+                            enabled. If specified, all targets used only in testing will
+                            built.
     --enable-address-sanitizer
                             Indicates that Address Sanitizer should be enabled
     --enable-undefined-behavior-sanitizer
@@ -81,10 +85,14 @@ make_program="make"
 make_program_config=""
 build_jobs=0
 debug_config="-DCMAKE_BUILD_TYPE=Release"
-unit_test_config="-DIRODS_UNIT_TESTS_BUILD=YES"
-msi_test_config="-DIRODS_MICROSERVICE_TEST_PLUGINS_BUILD=YES"
 enable_asan="-DIRODS_ENABLE_ADDRESS_SANITIZER=NO"
 custom_externals=""
+include_unit_tests=1
+unit_test_config="-DIRODS_UNIT_TESTS_BUILD=YES -DIRODS_UNIT_TESTS_ENABLE_ALL=YES"
+include_microservice_tests=1
+msi_test_config="-DIRODS_MICROSERVICE_TEST_PLUGINS_BUILD=YES"
+enable_all_tests=0
+all_tests_config=""
 
 common_cmake_args=(
     -DCMAKE_COLOR_MAKEFILE=ON
@@ -104,8 +112,9 @@ while [ -n "$1" ] ; do
         -j|--jobs)                    shift; build_jobs=$(($1 + 0));;
         -d|--debug)                   debug_config="-DCMAKE_BUILD_TYPE=Debug -DCPACK_DEBIAN_COMPRESSION_TYPE=none";;
         -C|--ccache)                  common_cmake_args+=(-DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache);;
-        --exclude-unit-tests)         unit_test_config="-DIRODS_UNIT_TESTS_BUILD=NO";;
-        --exclude-microservice-tests) msi_test_config="-DIRODS_MICROSERVICE_TEST_PLUGINS_BUILD=NO";;
+        --exclude-unit-tests)         include_unit_tests=0;;
+        --exclude-microservice-tests) include_microservice_tests=0;;
+        --enable-all-tests)           enable_all_tests=1;;
         --enable-address-sanitizer)   enable_asan="-DIRODS_ENABLE_ADDRESS_SANITIZER=YES";;
         --enable-undefined-behavior-sanitizer)   enable_ubsan="-DIRODS_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER=YES";;
         --enable-undefined-behavior-sanitizer-implicit-conversion)    enable_ubsan_implicit_conversion="-DIRODS_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER_IMPLICIT_CONVERSION_CHECK=YES";;
@@ -114,6 +123,23 @@ while [ -n "$1" ] ; do
     esac
     shift
 done
+
+# Interpret options regarding building and enabling (or not) unit tests, microservice tests, and all the other tests.
+if [[ ${enable_all_tests} -eq 1 ]] ; then
+    if [[ ${include_unit_tests} -eq 0 || ${include_microservice_tests} -eq 0 ]] ; then
+        echo "--exclude-unit-tests and --exclude-microservice-tests are incompatible with --enable-all-tests"
+        exit 1
+    fi
+    # This config must be explicitly set to YES/ON in order to be enabled.
+    all_tests_config="-DIRODS_ENABLE_ALL_TESTS=YES"
+else
+    if [[ ${include_unit_tests} -eq 0 ]] ; then
+        unit_test_config="-DIRODS_UNIT_TESTS_BUILD=NO -DIRODS_UNIT_TESTS_ENABLE_ALL=NO"
+    fi
+    if [[ ${include_microservice_tests} -eq 0 ]] ; then
+        msi_test_config="-DIRODS_MICROSERVICE_TEST_PLUGINS_BUILD=NO"
+    fi
+fi
 
 if [[ ! -z ${custom_externals} ]] ; then
     install_packages "${custom_externals}"/irods-externals-*."${file_extension}"
@@ -135,7 +161,7 @@ if [[ ${icommands_only} -eq 0 ]] ; then
 
     # Build iRODS
     mkdir -p /irods_build && cd /irods_build
-    cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} ${enable_asan} ${enable_ubsan} ${enable_ubsan_implicit_conversion} /irods_source
+    cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} ${all_tests_config} ${enable_asan} ${enable_ubsan} ${enable_ubsan_implicit_conversion} /irods_source
     if [[ -z ${build_jobs} ]] ; then
         ${make_program} package
     else
