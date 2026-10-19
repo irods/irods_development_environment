@@ -33,6 +33,7 @@ Available options:
     --enable-undefined-behavior-sanitizer-implicit-conversion
                             Indicates that the implicit conversion check of Undefined
                             Behavior Sanitizer should be enabled
+    --enable-static-sha     Sets the Git SHA to a static value, improving ccache speed
     --custom-externals      Path to custom externals packages received via volume mount
     -h, --help              This message
 _EOF_
@@ -86,6 +87,7 @@ make_program_config=""
 build_jobs=0
 debug_config="-DCMAKE_BUILD_TYPE=Release"
 enable_asan="-DIRODS_ENABLE_ADDRESS_SANITIZER=NO"
+enable_static_sha="-DIRODS_ENABLE_STATIC_SHA1=NO"
 custom_externals=""
 include_unit_tests=1
 unit_test_config="-DIRODS_UNIT_TESTS_BUILD=YES -DIRODS_UNIT_TESTS_ENABLE_ALL=YES"
@@ -118,6 +120,7 @@ while [ -n "$1" ] ; do
         --enable-address-sanitizer)   enable_asan="-DIRODS_ENABLE_ADDRESS_SANITIZER=YES";;
         --enable-undefined-behavior-sanitizer)   enable_ubsan="-DIRODS_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER=YES";;
         --enable-undefined-behavior-sanitizer-implicit-conversion)    enable_ubsan_implicit_conversion="-DIRODS_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER_IMPLICIT_CONVERSION_CHECK=YES";;
+        --enable-static-sha)          enable_static_sha="-DIRODS_ENABLE_STATIC_SHA1=YES";;
         --custom-externals)           shift; custom_externals=$1;;
         -h|--help)                    usage;;
     esac
@@ -161,7 +164,7 @@ if [[ ${icommands_only} -eq 0 ]] ; then
 
     # Build iRODS
     mkdir -p /irods_build && cd /irods_build
-    cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} ${all_tests_config} ${enable_asan} ${enable_ubsan} ${enable_ubsan_implicit_conversion} /irods_source
+    cmake ${make_program_config} ${debug_config} "${common_cmake_args[@]}" ${unit_test_config} ${msi_test_config} ${all_tests_config} ${enable_asan} ${enable_ubsan} ${enable_static_sha} ${enable_ubsan_implicit_conversion} /irods_source
     if [[ -z ${build_jobs} ]] ; then
         ${make_program} package
     else
